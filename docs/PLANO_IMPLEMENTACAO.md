@@ -4,7 +4,7 @@
 
 Implementar uma aplicação de demonstração para acompanhamento de pedidos, com dashboard, rastreamento simulado, administração e assistente de IA que consulta dados autorizados do usuário. Este documento define o escopo do MVP, controla a execução e estabelece os critérios de conclusão, da instalação da stack à publicação. As decisões técnicas estão em `docs/architecture.md`.
 
-**Situação em 26/09/2026:** fases 01 a 04 concluídas. Stack local, verificações de qualidade e CI remoto estão validados. O domínio de pedidos, dados de demonstração e matriz de estados estão implementados e testados. Decisões críticas da fase 01 preservadas; nenhum serviço externo provisionado. Fase 05 ainda não iniciada.
+**Situação em 26/09/2026:** fases 01 a 05 concluídas. Stack local, verificações de qualidade e CI remoto estão validados. O domínio de pedidos, dados de demonstração, autenticação por token e autorização no backend estão implementados e testados. Decisões críticas da fase 01 preservadas; nenhum serviço externo provisionado. Fase 06 ainda não iniciada.
 
 ## Regras de execução e commits
 
@@ -52,7 +52,7 @@ Decisões rotineiras, locais e reversíveis, compatíveis com o plano e sem cust
 | 02 | Monorepo, stack e ambiente local | 01 | Concluída |
 | 03 | Qualidade automatizada e integração contínua | 02 | Concluída |
 | 04 | Modelo de domínio e dados de demonstração | 03 | Concluída |
-| 05 | Autenticação e autorização no backend | 04 | Pendente |
+| 05 | Autenticação e autorização no backend | 04 | Concluída |
 | 06 | Base visual e autenticação no frontend | 05 | Pendente |
 | 07 | API de pedidos, dashboard e rastreamento | 06 | Pendente |
 | 08 | Interface de pedidos e dashboard | 07 | Pendente |
@@ -138,14 +138,14 @@ Decisões rotineiras, locais e reversíveis, compatíveis com o plano e sem cust
 ## Fase 05 — Autenticação e autorização no backend
 
 ### 5.1 Sessão
-- [ ] Implementar `POST /api/auth/login`, `POST /api/auth/logout` e `GET /api/auth/me` com tokens Sanctum.
-- [ ] Validar entrada, limitar tentativas de login, revogar tokens no logout e padronizar erros.
-- [ ] Configurar CORS para origens explícitas e aplicar a política de expiração definida.
+- [x] Implementar `POST /api/auth/login`, `POST /api/auth/logout` e `GET /api/auth/me` com tokens Sanctum.
+- [x] Validar entrada, limitar tentativas de login, revogar tokens no logout e padronizar erros.
+- [x] Configurar CORS para origens explícitas e aplicar a política de expiração definida.
 
 ### 5.2 Permissões
-- [ ] Implementar Policies e restrições por perfil para pedidos, conversas e administração.
-- [ ] Garantir que consultas e resolução de identificadores respeitem o usuário autenticado, inclusive relações aninhadas.
-- [ ] Testar login válido/inválido, token ausente/expirado/revogado, cliente versus administrador e acesso cruzado entre clientes.
+- [x] Implementar Policies e restrições por perfil para pedidos, conversas e administração.
+- [x] Garantir que consultas e resolução de identificadores respeitem o usuário autenticado, inclusive relações aninhadas.
+- [x] Testar login válido/inválido, token ausente/expirado/revogado, cliente versus administrador e acesso cruzado entre clientes.
 
 **Aceite:** autenticação funciona pela API; logout invalida acesso; um cliente não acessa recursos de outro nem rotas administrativas.
 
@@ -385,6 +385,18 @@ Preencher uma entrada ao encerrar cada fase, no mesmo commit da entrega:
 - Pendências desta fase: nenhuma. API, autenticação e a exposição desses dados seguem nas fases 05 a 11.
 - Commit de encerramento: `feat: add order domain and demonstration data`.
 - Próxima fase: 05 — Autenticação e autorização no backend (não iniciada).
+
+### Fase 05 — Autenticação e autorização no backend
+
+- Status: Concluída.
+- Início e encerramento: 26/09/2026.
+- Entregas: `POST /api/auth/login`, `POST /api/auth/logout` e `GET /api/auth/me`; `LoginRequest`; emissão de token Sanctum Bearer com expiração de 120 minutos; revogação somente do token corrente; `OrderPolicy`, `ConversationPolicy`, `ToolLogPolicy` e Gate `access-admin`; rota administrativa protegida para validar o perfil.
+- Verificações: Laravel Pint aprovado; `bash scripts/test-backend.sh` aprovou 17 testes e 141 assertions. A suíte cobre entrada inválida, credenciais incorretas, cinco falhas por e-mail/IP em 60 segundos, login e consulta de sessão, token ausente, expirado e revogado, cliente versus administrador e acesso cruzado a pedido, conversa e logs.
+- Decisões e desvios: a política D02 foi aplicada sem persistência do token no servidor de frontend: o backend retorna o token uma única vez e o cliente da fase 06 o manterá apenas em memória. CORS continua com origem explícita definida por `FRONTEND_URL`, cabeçalho `Authorization` permitido e cookies desativados. Clientes não acessam conversas de terceiros, inclusive como administrador; logs de ferramentas ficam restritos a administrador. O endpoint administrativo mínimo será substituído pelas rotas de gestão da fase 09.
+- Consultas críticas: nenhuma nova; aplicadas D02 e as restrições de acesso já autorizadas.
+- Pendências desta fase: nenhuma. Interfaces e consultas de pedidos protegidas serão implementadas nas fases seguintes sobre essas Policies.
+- Commit de encerramento: `feat: implement authentication and access policies`.
+- Próxima fase: 06 — Base visual e autenticação no frontend (não iniciada).
 
 ## Limites de escopo e conclusão do MVP
 

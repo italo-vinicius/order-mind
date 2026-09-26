@@ -76,6 +76,10 @@ Sessão e regras de negócio foram aprovadas via Ask Question em 26/09/2026. Os 
 
 Escolha explícita do usuário: token Sanctum apenas em memória, expiração em duas horas, revogação no logout e novo login ao recarregar a página. Limpar caches no logout ou mudança de usuário. Não persistir token em `localStorage` ou `sessionStorage` sem nova decisão explícita.
 
+Na fase 05, `POST /api/auth/login` emite um token Bearer Sanctum com `expires_at` de 120 minutos e devolve somente os dados mínimos do usuário. `POST /api/auth/logout` remove o token apresentado, e `GET /api/auth/me` requer `auth:sanctum`. Falhas de autenticação retornam o mesmo erro para e-mail e senha; cinco tentativas inválidas para o mesmo e-mail/IP bloqueiam novas tentativas por 60 segundos. CORS aceita apenas `FRONTEND_URL`, permite `Authorization` e não aceita cookies. A origem e o tempo de expiração são configuráveis por ambiente, com os valores seguros padrão documentados em `.env.example`.
+
+`OrderPolicy` permite ao cliente somente pedidos próprios e ao administrador todos os pedidos. `ConversationPolicy` permite somente o titular, inclusive para administradores; `ToolLogPolicy` permite somente administradores. O Gate `access-admin` protege as rotas administrativas. Controllers das fases seguintes devem autorizar o recurso antes de carregar relações aninhadas ou devolver dados.
+
 A autenticação SPA por cookie do Sanctum exige domínio raiz compartilhado. Usar cookie/proxy com os domínios distintos previstos demanda uma decisão de arquitetura; não será adotado automaticamente. [Sanctum](https://laravel.com/docs/13.x/sanctum).
 
 ### Regras de negócio — aprovadas em 26/09/2026
