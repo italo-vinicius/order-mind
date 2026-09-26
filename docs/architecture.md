@@ -145,4 +145,18 @@ Os lockfiles são a referência das versões exatas das bibliotecas. As imagens 
 
 Setup executado no projeto e em cópia limpa sem `vendor`/`node_modules`, com banco e portas isolados. Build TypeScript/Vite e validação estrita do Composer aprovados. PHPUnit inicial: três testes e 12 assertions para saúde, falha sanitizada e CORS; Pint aprovado. Chromium temporário confirmou React → API → PostgreSQL, nova tentativa, erro 503/recuperação, navegação 404, layout em 390 px sem overflow e rejeição de origem não autorizada pelo navegador.
 
-Pest, Vitest, Playwright integrado ao repositório, ESLint, Prettier e CI ficam para a fase 03. O Chromium desta validação foi instalado em `/tmp`, sem criar dependência permanente no projeto. O Dockerfile atual é de desenvolvimento; produção continua nas fases 13–14.
+O Dockerfile atual é de desenvolvimento; produção continua nas fases 13–14.
+
+## Entrega da fase 03 — qualidade e integração contínua
+
+### Ferramentas
+
+- **Backend:** Pest 4.7.8 com plugin Laravel 4.1.0 e Laravel Pint. `scripts/test-backend.sh` sobe `database-test`, aplica `migrate:fresh` somente nele e executa Pest. A base principal `database` e seu volume não são alvo desse comando.
+- **Frontend:** ESLint 10, Prettier 3, TypeScript, Vitest 5 em JSDOM, React Testing Library e user-event. A cobertura numérica fica desativada até existirem fluxos que a tornem útil; os testes focam comportamentos críticos.
+- **Ponta a ponta:** Playwright 1.63, com Chromium e smoke tests da página inicial. O binário do navegador fica fora do repositório no desenvolvimento; o CI o instala no runner.
+
+### Isolamento e pipeline
+
+`database-test` usa PostgreSQL 17.11, banco, usuário e volume próprios. O `phpunit.xml` seleciona essa conexão; há um teste que confirma o driver e `current_database()`. Migrations de teste não podem tocar no banco de desenvolvimento por configuração ou pelo script de execução.
+
+`.github/workflows/quality.yml` executa em pushes para `main` e pull requests. O job restaura dependências pelos lockfiles, cria arquivos de ambiente descartáveis, constrói o runtime PHP, verifica Pint/Prettier/ESLint/TypeScript/Composer, executa Vitest e Pest, inicia API e frontend, consulta `/api/health` e roda Playwright. Relatórios do navegador são anexados se houver falha. A primeira execução no GitHub será confirmada depois do push do commit da fase.

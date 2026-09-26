@@ -25,11 +25,11 @@ Run PHP and Composer in containers; the host PHP version differs from the applic
 
 ## Coding Style & Naming Conventions
 
-Use two-space indentation for TypeScript and four spaces for PHP. Use PascalCase for React components and PHP classes, camelCase for functions and variables, and snake_case for database columns and AI tool identifiers such as `get_latest_order`. Laravel Pint is available in the backend. ESLint and Prettier configuration belongs to phase 03.
+Use two-space indentation for TypeScript and four spaces for PHP. Use PascalCase for React components and PHP classes, camelCase for functions and variables, and snake_case for database columns and AI tool identifiers such as `get_latest_order`. Run Laravel Pint for PHP and ESLint plus Prettier for frontend changes.
 
 ## Testing Guidelines
 
-Initial PHPUnit tests in `backend/tests/Feature/HealthTest.php` cover health and CORS. Phase 03 introduces Pest, Vitest/React Testing Library, and Playwright. Name backend tests `*Test.php`. Prioritize user isolation, authentication, status transitions, cancellation, and AI tool validation; simulate external failures. No numeric coverage threshold is defined.
+Pest runs backend tests in `backend/tests/Feature/`; use `bash scripts/test-backend.sh` because it creates a disposable schema in the isolated `database-test` PostgreSQL service. Vitest/React Testing Library covers `frontend/src/**/*.test.*`; Playwright smoke tests are in `frontend/e2e/`. Name backend tests `*Test.php`. Prioritize user isolation, authentication, status transitions, cancellation, and AI tool validation; simulate external failures. No numeric coverage threshold is defined.
 
 ## Commit & Pull Request Guidelines
 

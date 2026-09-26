@@ -4,7 +4,7 @@
 
 Implementar uma aplicação de demonstração para acompanhamento de pedidos, com dashboard, rastreamento simulado, administração e assistente de IA que consulta dados autorizados do usuário. Este documento define o escopo do MVP, controla a execução e estabelece os critérios de conclusão, da instalação da stack à publicação. As decisões técnicas estão em `docs/architecture.md`.
 
-**Situação em 26/09/2026:** fases 01 e 02 concluídas. Stack local instalada, frontend conectado à API e ao PostgreSQL, setup validado em cópia limpa. Decisões críticas da fase 01 preservadas; nenhum serviço externo provisionado. Fase 03 ainda não iniciada.
+**Situação em 26/09/2026:** fases 01, 02 e 03 concluídas. Stack local, qualidade automatizada e workflow de CI configurados e validados localmente. Decisões críticas da fase 01 preservadas; nenhum serviço externo provisionado. A primeira execução remota do CI será verificada após o push. Fase 04 ainda não iniciada.
 
 ## Regras de execução e commits
 
@@ -50,7 +50,7 @@ Decisões rotineiras, locais e reversíveis, compatíveis com o plano e sem cust
 | --- | --- | --- | --- |
 | 01 | Pré-requisitos e decisões técnicas | — | Concluída |
 | 02 | Monorepo, stack e ambiente local | 01 | Concluída |
-| 03 | Qualidade automatizada e integração contínua | 02 | Pendente |
+| 03 | Qualidade automatizada e integração contínua | 02 | Concluída |
 | 04 | Modelo de domínio e dados de demonstração | 03 | Pendente |
 | 05 | Autenticação e autorização no backend | 04 | Pendente |
 | 06 | Base visual e autenticação no frontend | 05 | Pendente |
@@ -104,14 +104,14 @@ Decisões rotineiras, locais e reversíveis, compatíveis com o plano e sem cust
 ## Fase 03 — Qualidade automatizada e integração contínua
 
 ### 3.1 Ferramentas
-- [ ] Configurar ESLint, Prettier, checagem TypeScript e Laravel Pint, com comandos documentados.
-- [ ] Configurar Pest, Vitest, React Testing Library e Playwright conforme a decisão da fase 01.
-- [ ] Preparar banco PostgreSQL isolado para testes, factories e substituição das chamadas externas nos testes.
+- [x] Configurar ESLint, Prettier, checagem TypeScript e Laravel Pint, com comandos documentados.
+- [x] Configurar Pest, Vitest, React Testing Library e Playwright conforme a decisão da fase 01.
+- [x] Preparar banco PostgreSQL isolado para testes, factories e substituição das chamadas externas nos testes.
 
 ### 3.2 Pipeline
-- [ ] Criar GitHub Actions para instalação por lockfiles, lint, tipos, testes e build do frontend.
-- [ ] Adicionar verificações básicas de saúde da API e renderização inicial para validar o pipeline.
-- [ ] Definir execução dos testes ponta a ponta no CI assim que os fluxos estiverem implementados.
+- [x] Criar GitHub Actions para instalação por lockfiles, lint, tipos, testes e build do frontend.
+- [x] Adicionar verificações básicas de saúde da API e renderização inicial para validar o pipeline.
+- [x] Definir execução dos testes ponta a ponta no CI assim que os fluxos estiverem implementados.
 
 **Aceite:** comandos locais documentados passam; pipeline configurado e, havendo remoto disponível, execução no GitHub validada. Não estabelecer percentual arbitrário de cobertura: priorizar comportamentos críticos.
 
@@ -358,6 +358,19 @@ Preencher uma entrada ao encerrar cada fase, no mesmo commit da entrega:
 - Pendências desta fase: nenhuma. Autenticação funcional, pedidos e IA seguem nas fases previstas. Ambiente de produção ainda não implementado.
 - Commit de encerramento: `chore: bootstrap application stack and local environment`.
 - Próxima fase: 03 — Qualidade automatizada e integração contínua (não iniciada).
+
+### Fase 03 — Qualidade automatizada e integração contínua
+
+- Status: Concluída.
+- Início e encerramento: 26/09/2026.
+- Entregas: Pest e plugin Laravel; PostgreSQL `database-test` com volume isolado e executor `scripts/test-backend.sh`; ESLint, Prettier, Vitest, React Testing Library e Playwright no frontend; testes de cliente HTTP, interface, banco de teste e smoke tests; workflow GitHub Actions em `.github/workflows/quality.yml`.
+- Verificações: Pint, Prettier, ESLint, TypeScript, Vitest (5 testes), Pest (4 testes, 15 assertions) e Playwright/Chromium (2 testes) aprovados localmente. O banco de teste executou migrations próprias e o teste confirmou `ordermind_test`; API, frontend e banco de desenvolvimento continuaram separados.
+- Pipeline: o workflow instala pelos lockfiles, configura ambiente efêmero, executa análise, testes e build, inicia API/frontend, consulta `/api/health` e roda Chromium. Relatório Playwright será anexado se houver falha.
+- Decisões e desvios: nenhum custo ou serviço externo. PHPUnit permanece como dependência transitiva do Pest; os testes passam a ser executados pelo Pest. A primeira execução do workflow no GitHub depende do próximo push e deve ser conferida antes de usar a CI como requisito de merge.
+- Consultas críticas: nenhuma nova; aplicadas as decisões D01–D04 previamente aprovadas.
+- Pendências desta fase: nenhuma para a entrega local. Cobertura numérica e testes ponta a ponta de produto serão ampliados junto dos fluxos das próximas fases.
+- Commit de encerramento: `ci: configure formatting tests and build checks`.
+- Próxima fase: 04 — Modelo de domínio e dados de demonstração (não iniciada).
 
 ## Limites de escopo e conclusão do MVP
 

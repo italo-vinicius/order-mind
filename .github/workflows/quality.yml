@@ -1,0 +1,81 @@
+name: Quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Lint, test, build and browser smoke test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.23.3
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies from lockfile
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build the PHP runtime
+        run: docker compose build backend
+
+      - name: Install backend dependencies from lockfile
+        run: docker compose run --rm --no-deps backend composer install --no-interaction --prefer-dist
+
+      - name: Prepare local runtime configuration
+        run: |
+          cp .env.example .env
+          printf '\nLOCAL_UID=%s\nLOCAL_GID=%s\n' "$(id -u)" "$(id -g)" >> .env
+          cp backend/.env.example backend/.env
+          cp frontend/.env.example frontend/.env
+          docker compose run --rm --no-deps backend php artisan key:generate --no-interaction
+
+      - name: Check formatting and static analysis
+        run: |
+          docker compose run --rm --no-deps backend vendor/bin/pint --test
+          npm --prefix frontend run format:check
+          npm --prefix frontend run lint
+          npm --prefix frontend run typecheck
+          npm --prefix frontend run build
+          docker compose run --rm --no-deps backend composer validate --strict
+
+      - name: Run unit and integration tests
+        run: |
+          npm --prefix frontend run test
+          bash scripts/test-backend.sh
+
+      - name: Start services and check API readiness
+        run: |
+          docker compose up -d --wait database backend frontend
+          curl --fail --retry 5 --retry-connrefused http://localhost:8000/api/health
+
+      - name: Install Chromium
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser smoke tests
+        working-directory: frontend
+        run: npm run test:e2e
+
+      - name: Upload browser report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report
+          if-no-files-found: ignore

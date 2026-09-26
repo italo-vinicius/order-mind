@@ -29,6 +29,21 @@ services:
       retries: 10
       start_period: 10s
 
+  database-test:
+    image: postgres:17.11-bookworm
+    environment:
+      POSTGRES_DB: ordermind_test
+      POSTGRES_USER: ordermind_test
+      POSTGRES_PASSWORD: local-test-only
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ordermind_test -d ordermind_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
   backend:
     <<: *backend
     ports:
@@ -73,3 +88,4 @@ services:
 
 volumes:
   postgres_data:
+  postgres_test_data:

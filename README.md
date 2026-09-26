@@ -66,13 +66,27 @@ Execute na raiz:
 | `docker compose run --rm --no-deps backend php artisan test` | Executar testes iniciais de saúde e CORS |
 | `docker compose run --rm --no-deps backend vendor/bin/pint --test` | Verificar estilo PHP |
 
+## Qualidade e testes
+
+| Comando | Uso |
+| --- | --- |
+| `docker compose run --rm --no-deps frontend npm run format:check` | Conferir Prettier |
+| `docker compose run --rm --no-deps frontend npm run lint` | Executar ESLint |
+| `docker compose run --rm --no-deps frontend npm run typecheck` | Conferir TypeScript |
+| `docker compose run --rm --no-deps frontend npm run test` | Executar Vitest e React Testing Library |
+| `bash scripts/test-backend.sh` | Iniciar PostgreSQL de testes, recriar somente esse banco e executar Pest |
+| `PLAYWRIGHT_BROWSERS_PATH=/tmp/ordermind-playwright npx --prefix frontend playwright install chromium` | Baixar Chromium temporário para testes locais |
+| `PLAYWRIGHT_BROWSERS_PATH=/tmp/ordermind-playwright npm --prefix frontend run test:e2e` | Executar smoke tests Playwright contra os serviços ativos |
+
+O banco de testes é o serviço isolado `database-test`, com volume próprio e credenciais exclusivas de desenvolvimento. `scripts/test-backend.sh` executa `migrate:fresh` apenas nesse banco; nunca aponta para o volume de desenvolvimento. O primeiro teste ponta a ponta precisa do Chromium. No GitHub Actions, o workflow baixa esse navegador e executa a mesma sequência de lint, tipos, testes, build e verificação da API.
+
 O worker precisa das migrations de `jobs` e `failed_jobs`, executadas pelo setup. Após alterações, use `queue:restart` ou reinicie o serviço `queue`; o Compose reinicia o processo encerrado graciosamente.
 
 Para frontend no host, use a versão de `.nvmrc`: `cd frontend`, `npm ci` e `npm run dev`. Pare o serviço frontend do Compose para liberar a porta. A API continua em Docker.
 
 ## Validação e limites da entrega
 
-Os testes iniciais verificam resposta saudável, indisponibilidade do banco sem vazamento de detalhes e CORS restrito. A verificação real do PostgreSQL acontece pelo endpoint em execução. A configuração completa de Pest, testes do frontend, Playwright, ESLint, Prettier e CI pertence à fase 03.
+Pest verifica a conexão PostgreSQL exclusiva de testes, saúde, indisponibilidade sanitizada e CORS restrito. Vitest cobre o cliente HTTP e os estados de conexão da interface. Playwright cobre a página carregada e seu estado recuperável de indisponibilidade. A verificação real do PostgreSQL também acontece pelo endpoint em execução.
 
 Este Compose e o servidor `artisan serve` são exclusivos de desenvolvimento. A imagem de produção e o deploy serão preparados nas fases 13–14. Não execute comandos que removam volumes se quiser manter os dados locais.
 
