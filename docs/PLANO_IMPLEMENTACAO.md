@@ -4,7 +4,7 @@
 
 Implementar uma aplicação de demonstração para acompanhamento de pedidos, com dashboard, rastreamento simulado, administração e assistente de IA que consulta dados autorizados do usuário. Este documento define o escopo do MVP, controla a execução e estabelece os critérios de conclusão, da instalação da stack à publicação. As decisões técnicas estão em `docs/architecture.md`.
 
-**Situação em 26/09/2026:** fases 01 a 05 concluídas. Stack local, verificações de qualidade e CI remoto estão validados. O domínio de pedidos, dados de demonstração, autenticação por token e autorização no backend estão implementados e testados. Decisões críticas da fase 01 preservadas; nenhum serviço externo provisionado. Fase 06 ainda não iniciada.
+**Situação em 26/09/2026:** fases 01 a 06 concluídas. Stack local, verificações de qualidade e CI remoto estão validados. O domínio de pedidos, dados de demonstração, autenticação por token, autorização no backend e fluxo de login no frontend estão implementados e testados. Decisões críticas da fase 01 preservadas; nenhum serviço externo provisionado. Fase 07 ainda não iniciada.
 
 ## Regras de execução e commits
 
@@ -53,7 +53,7 @@ Decisões rotineiras, locais e reversíveis, compatíveis com o plano e sem cust
 | 03 | Qualidade automatizada e integração contínua | 02 | Concluída |
 | 04 | Modelo de domínio e dados de demonstração | 03 | Concluída |
 | 05 | Autenticação e autorização no backend | 04 | Concluída |
-| 06 | Base visual e autenticação no frontend | 05 | Pendente |
+| 06 | Base visual e autenticação no frontend | 05 | Concluída |
 | 07 | API de pedidos, dashboard e rastreamento | 06 | Pendente |
 | 08 | Interface de pedidos e dashboard | 07 | Pendente |
 | 09 | Administração no backend e frontend | 08 | Pendente |
@@ -154,15 +154,15 @@ Decisões rotineiras, locais e reversíveis, compatíveis com o plano e sem cust
 ## Fase 06 — Base visual e autenticação no frontend
 
 ### 6.1 Estrutura da interface
-- [ ] Organizar rotas, páginas, componentes, serviços de API, tipos e hooks por responsabilidade.
-- [ ] Criar layout responsivo, navegação, componentes básicos, estados de carregamento e tratamento global de erros.
-- [ ] Configurar TanStack Query e cliente HTTP com autenticação e tratamento de sessão expirada.
+- [x] Organizar rotas, páginas, componentes, serviços de API, tipos e hooks por responsabilidade.
+- [x] Criar layout responsivo, navegação, componentes básicos, estados de carregamento e tratamento global de erros.
+- [x] Configurar TanStack Query e cliente HTTP com autenticação e tratamento de sessão expirada.
 
 ### 6.2 Login e navegação
-- [ ] Implementar login com React Hook Form e Zod, credenciais de demonstração visíveis e botão de entrada como cliente demo.
-- [ ] Implementar logout, proteção de rotas e navegação por perfil; limpar dados em cache ao encerrar ou trocar sessão.
-- [ ] Implementar mensagem de inicialização do servidor com tempo limite e opção de tentar novamente.
-- [ ] Testar login, logout, falhas, sessão expirada e navegação protegida.
+- [x] Implementar login com React Hook Form e Zod, credenciais de demonstração visíveis e botão de entrada como cliente demo.
+- [x] Implementar logout, proteção de rotas e navegação por perfil; limpar dados em cache ao encerrar ou trocar sessão.
+- [x] Implementar mensagem de inicialização do servidor com tempo limite e opção de tentar novamente.
+- [x] Testar login, logout, falhas, sessão expirada e navegação protegida.
 
 **Aceite:** cliente demo entra e sai pela interface; sessão segue a política definida; dados de uma sessão não aparecem em outra.
 
@@ -397,6 +397,18 @@ Preencher uma entrada ao encerrar cada fase, no mesmo commit da entrega:
 - Pendências desta fase: nenhuma. Interfaces e consultas de pedidos protegidas serão implementadas nas fases seguintes sobre essas Policies.
 - Commit de encerramento: `feat: implement authentication and access policies`.
 - Próxima fase: 06 — Base visual e autenticação no frontend (não iniciada).
+
+### Fase 06 — Base visual e autenticação no frontend
+
+- Status: Concluída.
+- Início e encerramento: 26/09/2026.
+- Entregas: cliente HTTP tipado e validado com Zod; `AuthProvider` com token somente em memória, expiração por temporizador e limpeza de cache; rotas protegidas e administrativas; layout responsivo; página de login com React Hook Form/Zod, credenciais públicas e entrada rápida como cliente demo; logout; mensagem de inicialização e nova tentativa do servidor.
+- Verificações: Prettier, ESLint, TypeScript, Vitest (cinco testes) e build Vite aprovados. Playwright/Chromium aprovou dois fluxos: login, logout e recarregamento exigindo novo login; estado indisponível com nova tentativa. O CI passou a aplicar migrations e seeders de demonstração antes desses testes de navegador.
+- Decisões e desvios: D02 foi aplicada literalmente: token não é gravado em `localStorage`, `sessionStorage` ou cookie; ao recarregar, a memória é perdida e a rota protegida retorna ao login. A expiração informada pelo backend também agenda a limpeza local; respostas 401 de requisições autenticadas limpam a sessão e o cache. O conteúdo de pedidos permanece como indicação de próxima etapa até a API da fase 07.
+- Consultas críticas: nenhuma nova; aplicada D02 já aprovada.
+- Pendências desta fase: nenhuma. Consultas reais de pedidos e dashboard seguem nas fases 07 e 08.
+- Commit de encerramento: `feat: add application layout and login flow`.
+- Próxima fase: 07 — API de pedidos, dashboard e rastreamento (não iniciada).
 
 ## Limites de escopo e conclusão do MVP
 

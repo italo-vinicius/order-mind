@@ -65,6 +65,8 @@ jobs:
       - name: Start services and check API readiness
         run: |
           docker compose up -d --wait database backend frontend
+          docker compose exec -T backend php artisan migrate --force
+          docker compose exec -T backend php artisan db:seed --force
           curl --fail --retry 5 --retry-connrefused http://localhost:8000/api/health
 
       - name: Install Chromium

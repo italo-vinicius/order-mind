@@ -80,6 +80,12 @@ Na fase 05, `POST /api/auth/login` emite um token Bearer Sanctum com `expires_at
 
 `OrderPolicy` permite ao cliente somente pedidos próprios e ao administrador todos os pedidos. `ConversationPolicy` permite somente o titular, inclusive para administradores; `ToolLogPolicy` permite somente administradores. O Gate `access-admin` protege as rotas administrativas. Controllers das fases seguintes devem autorizar o recurso antes de carregar relações aninhadas ou devolver dados.
 
+## Entrega da fase 06 — sessão e interface base
+
+O frontend separa integração HTTP em `frontend/src/lib/api.ts`, estado de sessão em `frontend/src/auth/`, elementos reutilizáveis em `frontend/src/components/` e rotas em `App.tsx`. `AuthProvider` mantém token, usuário e instante de expiração apenas no estado React. Ele agenda o encerramento ao vencer, limpa o cache TanStack Query no logout ou em resposta 401 e não usa qualquer armazenamento persistente. `ProtectedRoute` e `AdminRoute` impedem a renderização de páginas privadas sem a sessão e perfil apropriados.
+
+A tela `/login` valida e envia credenciais com React Hook Form e Zod. Ela mostra a conta pública do cliente demo, apresenta falhas da API e consulta a saúde do servidor com timeout de dez segundos e ação de nova tentativa. Após login, o layout mostra perfil e logout; pedidos ainda aguardam a API da fase 07. O CI aplica migrations e o `DemoDataSeeder` no ambiente efêmero antes dos testes Playwright para que o login de demonstração seja verificável de ponta a ponta.
+
 A autenticação SPA por cookie do Sanctum exige domínio raiz compartilhado. Usar cookie/proxy com os domínios distintos previstos demanda uma decisão de arquitetura; não será adotado automaticamente. [Sanctum](https://laravel.com/docs/13.x/sanctum).
 
 ### Regras de negócio — aprovadas em 26/09/2026
