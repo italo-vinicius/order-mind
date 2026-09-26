@@ -139,27 +139,23 @@ describe('App', () => {
           tracking_code: 'OM0000000002BR',
           latest_event_at: '2026-09-25T13:00:00.000000Z',
         },
-        items: {
-          data: [
-            {
-              sku: 'OM-CABO-01',
-              product_name: 'Cabo USB-C',
-              quantity: 1,
-              unit_price: '105.00',
-              total_amount: '105.00',
-            },
-          ],
-        },
-        tracking_events: {
-          data: [
-            {
-              status: 'processing',
-              description: 'Pagamento confirmado.',
-              location: 'Centro de distribuição',
-              occurred_at: '2026-09-25T13:00:00.000000Z',
-            },
-          ],
-        },
+        items: [
+          {
+            sku: 'OM-CABO-01',
+            product_name: 'Cabo USB-C',
+            quantity: 1,
+            unit_price: '105.00',
+            total_amount: '105.00',
+          },
+        ],
+        tracking_events: [
+          {
+            status: 'processing',
+            description: 'Pagamento confirmado.',
+            location: 'Centro de distribuição',
+            occurred_at: '2026-09-25T13:00:00.000000Z',
+          },
+        ],
       },
     }
     vi.mocked(api.getHealth).mockResolvedValue({ status: 'ok', database: 'ok' })

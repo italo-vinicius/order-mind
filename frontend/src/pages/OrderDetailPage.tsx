@@ -67,7 +67,7 @@ export function OrderDetailPage() {
           <article className="rounded-2xl bg-white p-6 shadow-sm">
             <h2 className="text-lg font-medium">Itens</h2>
             <div className="mt-4 space-y-4">
-              {data.items.data.map((item) => (
+              {data.items.map((item) => (
                 <div
                   key={item.sku}
                   className="flex justify-between gap-4 border-b border-[#173c34]/10 pb-4 last:border-0 last:pb-0"
@@ -100,7 +100,7 @@ export function OrderDetailPage() {
           <article className="rounded-2xl bg-white p-6 shadow-sm">
             <h2 className="text-lg font-medium">Linha do tempo</h2>
             <ol className="mt-5 space-y-5 border-l border-[#3b7039] pl-5">
-              {data.tracking_events.data.map((event, index) => (
+              {data.tracking_events.map((event, index) => (
                 <li key={`${event.occurred_at}-${index}`}>
                   <strong className="block">{event.description}</strong>
                   <span className="text-sm text-[#52675f]">

@@ -17,8 +17,8 @@ const orderDetailSchema = orderSchema.extend({
   discount_amount: z.string(),
   tracking_code: z.string().nullable(),
   cancellable_until: z.string().nullable().optional(),
-  delivered_at: z.string().nullable(),
-  cancelled_at: z.string().nullable(),
+  delivered_at: z.string().nullable().optional(),
+  cancelled_at: z.string().nullable().optional(),
   shipping_address: z.object({
     street: z.string().nullable().optional(),
     neighborhood: z.string().nullable().optional(),
@@ -33,27 +33,23 @@ const orderDetailSchema = orderSchema.extend({
       latest_event_at: z.string().nullable(),
     })
     .nullable(),
-  items: z.object({
-    data: z.array(
-      z.object({
-        sku: z.string(),
-        product_name: z.string(),
-        quantity: z.number(),
-        unit_price: z.string(),
-        total_amount: z.string(),
-      }),
-    ),
-  }),
-  tracking_events: z.object({
-    data: z.array(
-      z.object({
-        status: z.string().nullable(),
-        description: z.string(),
-        location: z.string().nullable(),
-        occurred_at: z.string().nullable(),
-      }),
-    ),
-  }),
+  items: z.array(
+    z.object({
+      sku: z.string(),
+      product_name: z.string(),
+      quantity: z.number(),
+      unit_price: z.string(),
+      total_amount: z.string(),
+    }),
+  ),
+  tracking_events: z.array(
+    z.object({
+      status: z.string().nullable(),
+      description: z.string(),
+      location: z.string().nullable(),
+      occurred_at: z.string().nullable(),
+    }),
+  ),
 })
 
 const dashboardSchema = z.object({

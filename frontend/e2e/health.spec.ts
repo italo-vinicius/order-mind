@@ -7,6 +7,9 @@ test('allows the customer demo to log in and log out', async ({ page }) => {
   await page.getByRole('button', { name: 'Entrar como cliente demo' }).click()
   await expect(page.getByRole('heading', { name: 'Seus pedidos' })).toBeVisible()
   await expect(page.getByText('Pedidos por status')).toBeVisible()
+  await page.getByText('OM-2026-0002', { exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Linha do tempo' })).toBeVisible()
+  await page.getByRole('link', { name: '← Voltar aos pedidos' }).click()
 
   await page.getByRole('button', { name: 'Sair' }).click()
   await expect(page.getByRole('heading', { name: 'Entrar na demonstração' })).toBeVisible()

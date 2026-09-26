@@ -429,7 +429,7 @@ Preencher uma entrada ao encerrar cada fase, no mesmo commit da entrega:
 - Status: Concluída.
 - Início e encerramento: 26/09/2026.
 - Entregas: dashboard responsivo com indicadores, gráfico de status, busca, filtros de status/transportadora e paginação pela URL; rota de detalhes com itens, totais, endereço mascarado, rastreamento e linha do tempo; confirmação de cancelamento e invalidação de dados relacionados após a mutação.
-- Verificações: Prettier, ESLint, TypeScript, Vitest (6 testes), build Vite e Playwright/Chromium (2 fluxos) aprovados. `bash scripts/test-backend.sh` aprovou 21 testes e 164 assertions; Pint aprovou. A validação ponta a ponta encontrou e corrigiu o contrato de `recent_orders`, que é uma lista direta na resposta do dashboard.
+- Verificações: Prettier, ESLint, TypeScript, Vitest (6 testes), build Vite e Playwright/Chromium (2 fluxos) aprovados. `bash scripts/test-backend.sh` aprovou 21 testes e 164 assertions; Pint aprovou. A validação ponta a ponta cobre a abertura de um pedido; os contratos de `recent_orders`, itens e eventos foram alinhados às listas diretas retornadas pelo Laravel, e campos nulos omitidos pelo Resource são aceitos pelo cliente.
 - Decisões e desvios: o recurso de detalhe passou a expor `cancellable_until`, permitindo oferecer o cancelamento apenas dentro das regras já aprovadas. A resposta de cancelamento agora inclui o resumo de rastreamento, mantendo o mesmo contrato da tela de detalhes. O acesso ao assistente permanece para a fase 11, pois chat e conversas ainda não possuem interface.
 - Consultas críticas: nenhuma nova; aplicadas D02 e D04 já aprovadas.
 - Pendências desta fase: nenhuma. A administração segue para a fase 09.
