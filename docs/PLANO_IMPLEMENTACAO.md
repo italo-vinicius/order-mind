@@ -4,7 +4,7 @@
 
 Implementar uma aplicação de demonstração para acompanhamento de pedidos, com dashboard, rastreamento simulado, administração e assistente de IA que consulta dados autorizados do usuário. Este documento define o escopo do MVP, controla a execução e estabelece os critérios de conclusão, da instalação da stack à publicação. As decisões técnicas estão em `docs/architecture.md`.
 
-**Situação em 26/09/2026:** fases 01 e 02 concluídas; fase 03 em andamento. Stack local e verificações de qualidade estão validadas localmente. O primeiro CI remoto revelou uma permissão de escrita no volume do Composer; o workflow foi corrigido e aguarda novo push para validação. Decisões críticas da fase 01 preservadas; nenhum serviço externo provisionado. Fase 04 ainda não iniciada.
+**Situação em 26/09/2026:** fases 01 a 04 concluídas. Stack local, verificações de qualidade e CI remoto estão validados. O domínio de pedidos, dados de demonstração e matriz de estados estão implementados e testados. Decisões críticas da fase 01 preservadas; nenhum serviço externo provisionado. Fase 05 ainda não iniciada.
 
 ## Regras de execução e commits
 
@@ -50,8 +50,8 @@ Decisões rotineiras, locais e reversíveis, compatíveis com o plano e sem cust
 | --- | --- | --- | --- |
 | 01 | Pré-requisitos e decisões técnicas | — | Concluída |
 | 02 | Monorepo, stack e ambiente local | 01 | Concluída |
-| 03 | Qualidade automatizada e integração contínua | 02 | Em andamento |
-| 04 | Modelo de domínio e dados de demonstração | 03 | Pendente |
+| 03 | Qualidade automatizada e integração contínua | 02 | Concluída |
+| 04 | Modelo de domínio e dados de demonstração | 03 | Concluída |
 | 05 | Autenticação e autorização no backend | 04 | Pendente |
 | 06 | Base visual e autenticação no frontend | 05 | Pendente |
 | 07 | API de pedidos, dashboard e rastreamento | 06 | Pendente |
@@ -119,15 +119,17 @@ Decisões rotineiras, locais e reversíveis, compatíveis com o plano e sem cust
 
 ## Fase 04 — Modelo de domínio e dados de demonstração
 
+**Status: Concluída em 26/09/2026.**
+
 ### 4.1 Persistência e regras
-- [ ] Criar migrations e models para usuários, pedidos, itens, rastreamento, conversas, mensagens e logs de ferramentas.
-- [ ] Configurar relacionamentos, índices, chaves estrangeiras, unicidade do número do pedido e campos monetários com precisão definida.
-- [ ] Criar `OrderStatus` com os sete estados do plano e documentar a matriz de transições e as regras de cancelamento.
+- [x] Criar migrations e models para usuários, pedidos, itens, rastreamento, conversas, mensagens e logs de ferramentas.
+- [x] Configurar relacionamentos, índices, chaves estrangeiras, unicidade do número do pedido e campos monetários com precisão definida.
+- [x] Criar `OrderStatus` com os sete estados do plano e documentar a matriz de transições e as regras de cancelamento.
 
 ### 4.2 Dados fictícios
-- [ ] Criar factories e seeders com um administrador, dois clientes e aproximadamente 30 pedidos, com três a seis itens e eventos coerentes.
-- [ ] Incluir diferentes transportadoras, estados, prazos, pedidos canceláveis e conversas de exemplo.
-- [ ] Definir reexecução segura dos seeders e separar credenciais públicas de demonstração de quaisquer credenciais operacionais.
+- [x] Criar factories e seeders com um administrador, dois clientes e aproximadamente 30 pedidos, com três a seis itens e eventos coerentes.
+- [x] Incluir diferentes transportadoras, estados, prazos, pedidos canceláveis e conversas de exemplo.
+- [x] Definir reexecução segura dos seeders e separar credenciais públicas de demonstração de quaisquer credenciais operacionais.
 
 **Aceite:** migrations executam em banco vazio; seeders produzem dados consistentes; testes verificam relacionamentos, valores e isolamento das fixtures. Operações de recriação do banco ficam restritas ao ambiente de teste/desenvolvimento.
 
@@ -361,16 +363,28 @@ Preencher uma entrada ao encerrar cada fase, no mesmo commit da entrega:
 
 ### Fase 03 — Qualidade automatizada e integração contínua
 
-- Status: Em andamento.
-- Início: 26/09/2026. Encerramento: pendente da validação remota.
+- Status: Concluída.
+- Início e encerramento: 26/09/2026.
 - Entregas: Pest e plugin Laravel; PostgreSQL `database-test` com volume isolado e executor `scripts/test-backend.sh`; ESLint, Prettier, Vitest, React Testing Library e Playwright no frontend; testes de cliente HTTP, interface, banco de teste e smoke tests; workflow GitHub Actions em `.github/workflows/quality.yml`.
 - Verificações: Pint, Prettier, ESLint, TypeScript, Vitest (5 testes), Pest (4 testes, 15 assertions) e Playwright/Chromium (2 testes) aprovados localmente. O banco de teste executou migrations próprias e o teste confirmou `ordermind_test`; API, frontend e banco de desenvolvimento continuaram separados.
-- Pipeline: o workflow instala pelos lockfiles, configura ambiente efêmero, executa análise, testes e build, inicia API/frontend, consulta `/api/health` e roda Chromium. Antes de qualquer comando Docker, cria o `.env` raiz com o UID/GID do runner para que o volume `backend/vendor` seja gravável. Relatório Playwright será anexado se houver falha.
-- Decisões e desvios: nenhum custo ou serviço externo. PHPUnit permanece como dependência transitiva do Pest; os testes passam a ser executados pelo Pest. A primeira execução no GitHub falhou antes de instalar o Composer porque o Compose usou o UID padrão `1000` antes de receber o UID/GID do runner. A correção foi registrada em commit separado, sem reescrever o commit que já foi enviado; o novo push deve ser conferido antes de encerrar a fase.
+- Pipeline: o workflow instala pelos lockfiles, configura ambiente efêmero, executa análise, testes e build, inicia API/frontend, consulta `/api/health` e roda Chromium. Antes de qualquer comando Docker, cria o `.env` raiz com o UID/GID do runner para que o volume `backend/vendor` seja gravável. Relatório Playwright é anexado se houver falha. A execução no GitHub passou após o commit de correção.
+- Decisões e desvios: nenhum custo ou serviço externo. PHPUnit permanece como dependência transitiva do Pest; os testes passam a ser executados pelo Pest. A primeira execução no GitHub falhou antes de instalar o Composer porque o Compose usou o UID padrão `1000` antes de receber o UID/GID do runner. O commit `fix(ci): match container user to runner` passou a criar o `.env` antes do Docker; o usuário confirmou a execução remota aprovada, sem reescrever o commit já enviado.
 - Consultas críticas: nenhuma nova; aplicadas as decisões D01–D04 previamente aprovadas.
-- Pendências desta fase: confirmar a execução remota após o push do ajuste de permissões. Cobertura numérica e testes ponta a ponta de produto serão ampliados junto dos fluxos das próximas fases.
+- Pendências desta fase: nenhuma. Cobertura numérica e testes ponta a ponta de produto serão ampliados junto dos fluxos das próximas fases.
 - Commits: `ci: configure formatting tests and build checks`; correção `fix(ci): match container user to runner`.
-- Próxima fase: 04 — Modelo de domínio e dados de demonstração (não iniciar antes da validação remota).
+- Próxima fase: 04 — Modelo de domínio e dados de demonstração (concluída).
+
+### Fase 04 — Modelo de domínio e dados de demonstração
+
+- Status: Concluída.
+- Início e encerramento: 26/09/2026.
+- Entregas: `UserRole` e `OrderStatus`; migrations para perfil, pedidos, itens, eventos de rastreamento, conversas, mensagens e logs de ferramentas; modelos, relações, casts de moeda/data/JSON e índices para consultas futuras; factories; `DemoDataSeeder` idempotente com administrador, dois clientes, 30 pedidos, três a seis itens por pedido, três transportadoras e conversas de exemplo.
+- Verificações: Laravel Pint aprovado; `bash scripts/test-backend.sh` aprovou 13 testes e 95 assertions, incluindo migrations em banco vazio, relações, casts, matriz de transições e duas execuções dos seeders sem duplicações. `php artisan migrate --force` aplicou as migrations no banco local; `php artisan db:seed --force` executou duas vezes com sucesso sem recriar o banco.
+- Decisões e desvios: a matriz aprovada é `pending_payment → processing → shipped → out_for_delivery → delivered`; `delayed` pode seguir para `out_for_delivery` ou `delivered`; `cancelled` só parte de `pending_payment` ou `processing`; `delivered` e `cancelled` são terminais. Valores monetários usam `numeric(12,2)`, e instantes usam timestamps com fuso. Os dados de demonstração usam somente identidades públicas `@ordermind.test` e não representam credenciais operacionais.
+- Consultas críticas: estados e transições consultados em 26/09/2026; usuário aprovou o fluxo recomendado, incluindo `delayed` e os dois estados terminais.
+- Pendências desta fase: nenhuma. API, autenticação e a exposição desses dados seguem nas fases 05 a 11.
+- Commit de encerramento: `feat: add order domain and demonstration data`.
+- Próxima fase: 05 — Autenticação e autorização no backend (não iniciada).
 
 ## Limites de escopo e conclusão do MVP
 

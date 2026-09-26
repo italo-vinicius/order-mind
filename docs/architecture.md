@@ -2,7 +2,7 @@
 
 ## Estado do documento
 
-Fases 01 e 02 consolidadas em 26/09/2026. Filas, sessão e regras de negócio aprovadas pelo usuário. Fundação local instalada e validada com Docker; nenhum serviço externo provisionado. Login, domínio de pedidos e integração Gemini continuam nas fases seguintes.
+Fases 01 a 04 consolidadas em 26/09/2026. Filas, sessão, regras de negócio e matriz de estados aprovadas pelo usuário. Fundação local e domínio de pedidos foram instalados e validados com Docker; nenhum serviço externo provisionado. Login e integração Gemini continuam nas fases seguintes.
 
 ## Arquitetura prevista
 
@@ -86,6 +86,22 @@ A autenticação SPA por cookie do Sanctum exige domínio raiz compartilhado. Us
 - Atraso: estimativa vencida e pedido não entregue/cancelado. Esse predicado rege indicadores e consultas de atrasados; o status explícito `delayed` continua representando o estado operacional registrado. A consulta não altera o status persistido.
 - Cancelamento: somente `pending_payment` ou `processing`, com instante atual menor ou igual a `cancellable_until`. A matriz completa das demais transições será documentada na fase 04; não introduzir exceções sem consulta.
 
+### Estados do pedido — aprovados na fase 04 em 26/09/2026
+
+Os sete valores persistidos são `pending_payment`, `processing`, `shipped`, `out_for_delivery`, `delayed`, `delivered` e `cancelled`. A matriz aprovada é:
+
+| Estado atual | Próximos estados permitidos |
+| --- | --- |
+| `pending_payment` | `processing`, `cancelled` |
+| `processing` | `shipped`, `cancelled` |
+| `shipped` | `out_for_delivery`, `delayed` |
+| `out_for_delivery` | `delivered`, `delayed` |
+| `delayed` | `out_for_delivery`, `delivered` |
+| `delivered` | nenhum (terminal) |
+| `cancelled` | nenhum (terminal) |
+
+O cancelamento continua condicionado a `pending_payment` ou `processing` e a `cancellable_until` inclusivo. `delayed` representa o atraso operacional; o cálculo por previsão vencida continua sendo um predicado de consulta e não altera o estado automaticamente.
+
 ## Hospedagem e orçamento
 
 Orçamento autorizado para novas despesas: **zero**. Não habilitar faturamento, upgrade automático ou recursos pagos. Nenhuma conta ou quota individual foi verificada nesta etapa.
@@ -159,4 +175,10 @@ O Dockerfile atual é de desenvolvimento; produção continua nas fases 13–14.
 
 `database-test` usa PostgreSQL 17.11, banco, usuário e volume próprios. O `phpunit.xml` seleciona essa conexão; há um teste que confirma o driver e `current_database()`. Migrations de teste não podem tocar no banco de desenvolvimento por configuração ou pelo script de execução.
 
-`.github/workflows/quality.yml` executa em pushes para `main` e pull requests. Antes do primeiro comando Docker, o job cria o `.env` raiz e define `LOCAL_UID`/`LOCAL_GID` com o usuário do runner, para que o bind mount de `backend/vendor` seja gravável pelo Composer. Depois restaura dependências pelos lockfiles, cria os demais arquivos de ambiente descartáveis, constrói o runtime PHP, verifica Pint/Prettier/ESLint/TypeScript/Composer, executa Vitest e Pest, inicia API e frontend, consulta `/api/health` e roda Playwright. Relatórios do navegador são anexados se houver falha. A primeira execução falhou antes da instalação do Composer por essa permissão; a correção aguarda novo push para confirmação remota.
+`.github/workflows/quality.yml` executa em pushes para `main` e pull requests. Antes do primeiro comando Docker, o job cria o `.env` raiz e define `LOCAL_UID`/`LOCAL_GID` com o usuário do runner, para que o bind mount de `backend/vendor` seja gravável pelo Composer. Depois restaura dependências pelos lockfiles, cria os demais arquivos de ambiente descartáveis, constrói o runtime PHP, verifica Pint/Prettier/ESLint/TypeScript/Composer, executa Vitest e Pest, inicia API e frontend, consulta `/api/health` e roda Playwright. Relatórios do navegador são anexados se houver falha. A primeira execução falhou antes da instalação do Composer por essa permissão; a correção foi enviada e a execução seguinte passou.
+
+## Entrega da fase 04 — domínio e dados de demonstração
+
+`User` tem perfil `admin` ou `customer`. `Order` pertence ao cliente e contém valores `numeric(12,2)`, endereço JSON, transportadora, código de rastreio, datas de pedido/estimativa/cancelamento/entrega e um `OrderStatus`. Itens e eventos pertencem ao pedido; conversas pertencem ao usuário; mensagens pertencem a conversas; logs de ferramenta mantêm o usuário e, quando aplicável, a conversa e mensagem de origem. Chaves estrangeiras, unicidade de `orders.number` e índices para proprietário, estado, data, transportadora e linha do tempo já estão definidos.
+
+`DemoDataSeeder` é seguro para reexecução: localiza registros de demonstração por identificadores estáveis antes de criá-los e não recria o banco. Ele gera `admin@ordermind.test`, `ana@ordermind.test` e `bruno@ordermind.test`, todos com a senha pública `ordermind-demo`, além de 30 pedidos e conversas fictícias. Essas credenciais existem somente para a demonstração local; credenciais operacionais jamais entram em seeders ou no repositório.
