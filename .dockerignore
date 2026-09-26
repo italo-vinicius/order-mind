@@ -1,0 +1,9 @@
+.git
+.env
+**/.env
+**/node_modules
+**/vendor
+**/dist
+**/coverage
+*.md
+docs

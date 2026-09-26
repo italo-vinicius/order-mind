@@ -4,7 +4,7 @@
 
 Implementar uma aplicação de demonstração para acompanhamento de pedidos, com dashboard, rastreamento simulado, administração e assistente de IA que consulta dados autorizados do usuário. Este documento define o escopo do MVP, controla a execução e estabelece os critérios de conclusão, da instalação da stack à publicação. As decisões técnicas estão em `docs/architecture.md`.
 
-**Situação em 26/09/2026:** fase 01 concluída: ambiente verificado, Git inicializado, remoto acessível, arquitetura e contratos documentados. Decisões críticas aprovadas via Ask Question. Nenhuma dependência de aplicação instalada ou infraestrutura externa provisionada; fase 02 ainda não iniciada.
+**Situação em 26/09/2026:** fases 01 e 02 concluídas. Stack local instalada, frontend conectado à API e ao PostgreSQL, setup validado em cópia limpa. Decisões críticas da fase 01 preservadas; nenhum serviço externo provisionado. Fase 03 ainda não iniciada.
 
 ## Regras de execução e commits
 
@@ -49,7 +49,7 @@ Decisões rotineiras, locais e reversíveis, compatíveis com o plano e sem cust
 | Fase | Entrega | Dependência | Status |
 | --- | --- | --- | --- |
 | 01 | Pré-requisitos e decisões técnicas | — | Concluída |
-| 02 | Monorepo, stack e ambiente local | 01 | Pendente |
+| 02 | Monorepo, stack e ambiente local | 01 | Concluída |
 | 03 | Qualidade automatizada e integração contínua | 02 | Pendente |
 | 04 | Modelo de domínio e dados de demonstração | 03 | Pendente |
 | 05 | Autenticação e autorização no backend | 04 | Pendente |
@@ -84,18 +84,18 @@ Decisões rotineiras, locais e reversíveis, compatíveis com o plano e sem cust
 ## Fase 02 — Monorepo, stack e ambiente local
 
 ### 2.1 Backend e banco
-- [ ] Criar `backend/` com Laravel e dependências compatíveis; instalar Sanctum e configurar PostgreSQL.
-- [ ] Criar ambiente Docker Compose para API, banco e execução local de filas, com volumes e verificações de saúde.
-- [ ] Implementar `GET /api/health` e configurar comunicação entre serviços.
+- [x] Criar `backend/` com Laravel e dependências compatíveis; instalar Sanctum e configurar PostgreSQL.
+- [x] Criar ambiente Docker Compose para API, banco e execução local de filas, com volumes e verificações de saúde.
+- [x] Implementar `GET /api/health` e configurar comunicação entre serviços.
 
 ### 2.2 Frontend
-- [ ] Criar `frontend/` com React, TypeScript e Vite.
-- [ ] Instalar React Router, TanStack Query, Tailwind CSS, shadcn/ui, React Hook Form, Zod e Recharts.
-- [ ] Configurar acesso à API por `VITE_API_URL` e validar uma chamada ao endpoint de saúde.
+- [x] Criar `frontend/` com React, TypeScript e Vite.
+- [x] Instalar React Router, TanStack Query, Tailwind CSS, shadcn/ui, React Hook Form, Zod e Recharts.
+- [x] Configurar acesso à API por `VITE_API_URL` e validar uma chamada ao endpoint de saúde.
 
 ### 2.3 Configuração reproduzível
-- [ ] Criar `.gitignore`, arquivos de versões, lockfiles, `.env.example` dos dois projetos e README inicial.
-- [ ] Documentar instalação, inicialização, parada, logs, migrations e execução de comandos dentro dos contêineres.
+- [x] Criar `.gitignore`, arquivos de versões, lockfiles, `.env.example` dos dois projetos e README inicial.
+- [x] Documentar instalação, inicialização, parada, logs, migrations e execução de comandos dentro dos contêineres.
 
 **Aceite:** um ambiente limpo consegue iniciar a stack pelas instruções; frontend acessa a API e Laravel conecta ao PostgreSQL; nenhum segredo está versionado.
 
@@ -344,6 +344,20 @@ Preencher uma entrada ao encerrar cada fase, no mesmo commit da entrega:
 - Validação de código: não aplicável; entrega documental, sem aplicação instalada. Revisão de integridade do Markdown e conteúdo do commit antes do encerramento.
 - Commit de encerramento: `docs: define environment and architecture decisions`.
 - Próxima fase: 02 — Monorepo, stack e ambiente local (não iniciada).
+
+### Fase 02 — Monorepo, stack e ambiente local
+
+- Status: Concluída.
+- Início e encerramento: 26/09/2026.
+- Entregas: `frontend/` React/TypeScript/Vite com dependências previstas e botão shadcn; `backend/` Laravel/Sanctum/PostgreSQL; API de saúde com tratamento 503; CORS restrito; Compose com API, banco persistente, frontend e worker; runtime PHP; exemplos de ambiente, lockfiles, `.nvmrc`, `.editorconfig`, regras de exclusão e README; script de setup reproduzível; guia de contribuição atualizado.
+- Verificações: `bash scripts/setup.sh` aprovado no projeto e em cópia temporária sem dependências, com banco isolado; quatro migrations aplicadas; `/api/health` retornou 200 com banco saudável nos dois ambientes; build TypeScript/Vite aprovado; `composer validate --strict` aprovado; `php artisan test` com três testes e 12 assertions aprovados; `vendor/bin/pint --test` aprovado.
+- Evidência de interface: Chromium temporário validou chamada React → API → PostgreSQL, nova tentativa, 503/recuperação, rota inexistente, viewport móvel de 390 px sem overflow e bloqueio CORS de origem não autorizada. Capturas locais revisadas em desktop e celular.
+- Versões: Laravel 13.33.0, Sanctum 4.3.3, React 19.3.0, TypeScript 6.0.3 e Vite 8.3.1; runtimes mantidos conforme fase 01. Lista complementar em `docs/architecture.md` e versões exatas nos lockfiles.
+- Decisões e desvios: removidos exemplos e ferramentas de template alheios ao monorepo; testes iniciais usam PHPUnit já fornecido pelo Laravel, com adoção de Pest e infraestrutura completa de qualidade mantida na fase 03. Sem mudança de escopo ou serviço pago.
+- Consultas críticas: nenhuma nova; aplicadas as decisões D01–D04 previamente aprovadas.
+- Pendências desta fase: nenhuma. Autenticação funcional, pedidos e IA seguem nas fases previstas. Ambiente de produção ainda não implementado.
+- Commit de encerramento: `chore: bootstrap application stack and local environment`.
+- Próxima fase: 03 — Qualidade automatizada e integração contínua (não iniciada).
 
 ## Limites de escopo e conclusão do MVP
 

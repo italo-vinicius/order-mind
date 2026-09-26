@@ -2,9 +2,9 @@
 
 ## Project Structure & Module Organization
 
-This repository has completed its environment and architecture planning. Consult `docs/PLANO_IMPLEMENTACAO.md` for MVP scope, implementation phases, and completion criteria, and `docs/architecture.md` for technical decisions. Application directories and tooling have not yet been created.
+The local application foundation is implemented. Consult `docs/PLANO_IMPLEMENTACAO.md` for MVP scope, phase status, and completion criteria, and `docs/architecture.md` for technical decisions. `README.md` documents setup and daily commands.
 
-Follow the planned monorepo layout when implementing:
+Follow this monorepo layout:
 - `frontend/src/`: React and TypeScript application; `frontend/public/`: static assets.
 - `backend/app/`: Laravel controllers, requests, resources, policies, actions, and AI tools.
 - `backend/database/`: migrations, factories, and fictional demonstration seeders.
@@ -15,21 +15,21 @@ Keep controllers small, validation in Form Requests, authorization in Policies, 
 
 ## Build, Test, and Development Commands
 
-No build, development, or test commands are currently configured. After scaffolding, establish and document these expected commands in `README.md`:
-- `cd frontend && npm run dev`: start Vite locally.
-- `cd frontend && npm run build`: build the frontend for production.
-- `cd backend && php artisan test`: run backend tests.
-- `docker compose up --build`: build and start local services once Compose is configured.
+- `bash scripts/setup.sh`: prepare dependencies, environment files, migrations, and local services.
+- `docker compose up -d --wait`: start the prepared environment.
+- `docker compose run --rm --no-deps frontend npm run build`: check TypeScript and build the frontend.
+- `docker compose run --rm --no-deps backend php artisan test`: run backend tests.
+- `docker compose down`: stop services while preserving database data.
 
-Verify scripts and configuration exist before using these commands.
+Run PHP and Composer in containers; the host PHP version differs from the application's runtime.
 
 ## Coding Style & Naming Conventions
 
-Until formatters are configured, use two-space indentation for TypeScript and four spaces for PHP. Use PascalCase for React components and PHP classes, camelCase for functions and variables, and snake_case for database columns and AI tool identifiers such as `get_latest_order`. Configure linting and formatting during foundation work and document their commands.
+Use two-space indentation for TypeScript and four spaces for PHP. Use PascalCase for React components and PHP classes, camelCase for functions and variables, and snake_case for database columns and AI tool identifiers such as `get_latest_order`. Laravel Pint is available in the backend. ESLint and Prettier configuration belongs to phase 03.
 
 ## Testing Guidelines
 
-The plan calls for Pest or PHPUnit; neither is configured, and no coverage threshold or frontend framework is defined. Name backend test files `*Test.php` under `backend/tests/`. Prioritize integration tests for user isolation, authentication, status transitions, cancellation, and AI tool validation. Test frontend login, filters, chat, loading, and error states. Simulate Gemini failures without live API calls.
+Initial PHPUnit tests in `backend/tests/Feature/HealthTest.php` cover health and CORS. Phase 03 introduces Pest, Vitest/React Testing Library, and Playwright. Name backend tests `*Test.php`. Prioritize user isolation, authentication, status transitions, cancellation, and AI tool validation; simulate external failures. No numeric coverage threshold is defined.
 
 ## Commit & Pull Request Guidelines
 

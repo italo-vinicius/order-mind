@@ -1,8 +1,8 @@
-# OrderMind — Arquitetura e decisões da fase 01
+# OrderMind — Arquitetura e decisões técnicas
 
 ## Estado do documento
 
-Decisões consolidadas em 26/09/2026. Filas, sessão e regras de negócio aprovadas pelo usuário; remoto configurado e consultado com sucesso. Nenhum serviço externo foi provisionado e nenhuma dependência da aplicação foi instalada. A instalação da stack e sua validação integrada pertencem à fase 02.
+Fases 01 e 02 consolidadas em 26/09/2026. Filas, sessão e regras de negócio aprovadas pelo usuário. Fundação local instalada e validada com Docker; nenhum serviço externo provisionado. Login, domínio de pedidos e integração Gemini continuam nas fases seguintes.
 
 ## Arquitetura prevista
 
@@ -33,9 +33,9 @@ Laravel concentra autenticação, Policies, validação e regras de negócio. O 
 | `backend/tests/` | Testes de integração e domínio |
 | `docs/` | Arquitetura, acompanhamento e screenshots |
 
-Esses diretórios de aplicação serão criados na fase 02 ou na fase da funcionalidade correspondente.
+A base de `frontend/` e `backend/` foi criada na fase 02. Policies, Actions, ferramentas de IA e provedores de rastreamento serão adicionados com suas funcionalidades.
 
-## Inventário verificado
+## Inventário do host na fase 01
 
 | Ferramenta | Versão observada | Verificação |
 | --- | --- | --- |
@@ -111,3 +111,38 @@ O plano prevê `GenerateConversationTitleJob`. Um worker separado no Render não
 | D04 | BRL, UTC/São Paulo, gasto por placed_at sem cancelados, atraso por previsão vencida, cancelamento em pending_payment/processing até o prazo inclusive | Aprovado via Ask Question em 26/09/2026 |
 
 As quatro consultas foram resolvidas. O encerramento da fase 01 registra este documento e o plano no commit `docs: define environment and architecture decisions`. A fase 02 começa com o scaffold e a instalação isolada dos runtimes definidos; nenhuma mudança no PHP global é necessária.
+
+
+## Entrega da fase 02 — ambiente local
+
+### Versões resolvidas
+
+| Componente | Versão instalada |
+| --- | --- |
+| PHP / Composer (contêiner) | 8.4.26 / 2.10.3 |
+| Laravel / Sanctum | 13.33.0 / 4.3.3 |
+| PostgreSQL | 17.11 |
+| Node.js / npm (contêiner) | 22.23.3 / 10.9.9 |
+| React / TypeScript / Vite | 19.3.0 / 6.0.3 / 8.3.1 |
+| React Router / TanStack Query | 7.18.4 / 5.104.0 |
+| Tailwind CSS / shadcn CLI | 4.3.3 / 4.21.0 |
+| React Hook Form / Zod / Recharts | 7.89.0 / 3.25.76 / 3.10.1 |
+
+Os lockfiles são a referência das versões exatas das bibliotecas. As imagens Docker usam tags de patch explícitas; nenhuma configuração permanente usa `latest`. O scaffold foi gerado por `create-vite` 9.2.1 e `laravel/laravel` 13.10.1. shadcn foi inicializado com tema `base-nova`, botão baseado em Base UI e fonte Geist servida localmente.
+
+### Serviços e configuração
+
+- `database`: PostgreSQL em volume nomeado, sem porta publicada no host.
+- `backend`: `artisan serve` em `localhost:8000`, com check HTTP que consulta o PostgreSQL.
+- `frontend`: Vite em `localhost:5173`, consumindo `VITE_API_URL` pelo navegador; React Router e TanStack Query inicializados.
+- `queue`: worker Laravel com conexão `database`, migrations de fila e reinício local após saída do processo. Jobs do produto virão nas fases correspondentes.
+- PHP/Composer e Node/npm executam como o UID/GID local, sem alterar runtimes globais. Dependências ficam em diretórios ignorados dentro do projeto.
+- `bash scripts/setup.sh` prepara um clone limpo: exemplos de ambiente, dependências pelos lockfiles, chave local quando vazia, migrations e inicialização.
+- `DATABASE_URL` é lida pela conexão PostgreSQL; `DB_*` atendem ao desenvolvimento. CORS aceita somente `FRONTEND_URL`. Sanctum instalado com expiração de 120 minutos; login e emissão de tokens ainda não implementados.
+- `/api/health`: readiness, com HTTP 200/503 e payload mínimo sobre o banco. `/up`: liveness do Laravel. A página inicial mostra conexão, indisponibilidade e nova tentativa, sem apresentar recursos de pedidos ainda inexistentes.
+
+### Verificações realizadas
+
+Setup executado no projeto e em cópia limpa sem `vendor`/`node_modules`, com banco e portas isolados. Build TypeScript/Vite e validação estrita do Composer aprovados. PHPUnit inicial: três testes e 12 assertions para saúde, falha sanitizada e CORS; Pint aprovado. Chromium temporário confirmou React → API → PostgreSQL, nova tentativa, erro 503/recuperação, navegação 404, layout em 390 px sem overflow e rejeição de origem não autorizada pelo navegador.
+
+Pest, Vitest, Playwright integrado ao repositório, ESLint, Prettier e CI ficam para a fase 03. O Chromium desta validação foi instalado em `/tmp`, sem criar dependência permanente no projeto. O Dockerfile atual é de desenvolvimento; produção continua nas fases 13–14.

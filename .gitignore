@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+**/node_modules/
+**/vendor/
+**/dist/
+**/coverage/
+**/.phpunit.cache/
+**/.phpunit.result.cache
+**/test-results/
+**/playwright-report/
+.DS_Store
+*.log
