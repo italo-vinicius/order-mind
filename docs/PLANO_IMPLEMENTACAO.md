@@ -4,7 +4,7 @@
 
 Implementar uma aplicação de demonstração para acompanhamento de pedidos, com dashboard, rastreamento simulado, administração e assistente de IA que consulta dados autorizados do usuário. Este documento define o escopo do MVP, controla a execução e estabelece os critérios de conclusão, da instalação da stack à publicação. As decisões técnicas estão em `docs/architecture.md`.
 
-**Situação em 26/09/2026:** fases 01 a 06 concluídas. Stack local, verificações de qualidade e CI remoto estão validados. O domínio de pedidos, dados de demonstração, autenticação por token, autorização no backend e fluxo de login no frontend estão implementados e testados. Decisões críticas da fase 01 preservadas; nenhum serviço externo provisionado. Fase 07 ainda não iniciada.
+**Situação em 26/09/2026:** fases 01 a 07 concluídas. Stack local, verificações de qualidade e CI remoto estão validados. Consultas de pedidos, dashboard, cancelamento e rastreamento simulado estão implementados e testados. Decisões críticas da fase 01 preservadas; nenhum serviço externo provisionado. Fase 08 ainda não iniciada.
 
 ## Regras de execução e commits
 
@@ -54,7 +54,7 @@ Decisões rotineiras, locais e reversíveis, compatíveis com o plano e sem cust
 | 04 | Modelo de domínio e dados de demonstração | 03 | Concluída |
 | 05 | Autenticação e autorização no backend | 04 | Concluída |
 | 06 | Base visual e autenticação no frontend | 05 | Concluída |
-| 07 | API de pedidos, dashboard e rastreamento | 06 | Pendente |
+| 07 | API de pedidos, dashboard e rastreamento | 06 | Concluída |
 | 08 | Interface de pedidos e dashboard | 07 | Pendente |
 | 09 | Administração no backend e frontend | 08 | Pendente |
 | 10 | Ferramentas e orquestração de IA no backend | 09 | Pendente |
@@ -171,15 +171,15 @@ Decisões rotineiras, locais e reversíveis, compatíveis com o plano e sem cust
 ## Fase 07 — API de pedidos, dashboard e rastreamento
 
 ### 7.1 Consultas
-- [ ] Implementar `GET /api/dashboard`, `GET /api/orders` e `GET /api/orders/{order}` com Resources.
-- [ ] Implementar busca por número/produto, filtros de status/transportadora/período, ordenação permitida e paginação no backend.
-- [ ] Calcular totais e gasto mensal sem pedidos cancelados, aplicando período e fuso definidos.
-- [ ] Entregar detalhes, itens, endereço mascarado e eventos em ordem cronológica.
+- [x] Implementar `GET /api/dashboard`, `GET /api/orders` e `GET /api/orders/{order}` com Resources.
+- [x] Implementar busca por número/produto, filtros de status/transportadora/período, ordenação permitida e paginação no backend.
+- [x] Calcular totais e gasto mensal sem pedidos cancelados, aplicando período e fuso definidos.
+- [x] Entregar detalhes, itens, endereço mascarado e eventos em ordem cronológica.
 
 ### 7.2 Regras e rastreamento
-- [ ] Implementar `CancelOrderAction` e `POST /api/orders/{order}/cancel`, respeitando status e prazo em transação.
-- [ ] Criar contrato `TrackingProvider` e implementações simuladas de Correios, Jadlog e Loggi.
-- [ ] Testar isolamento, filtros, paginação, agregações, limites de prazo, cancelamento repetido e alterações concorrentes relevantes.
+- [x] Implementar `CancelOrderAction` e `POST /api/orders/{order}/cancel`, respeitando status e prazo em transação.
+- [x] Criar contrato `TrackingProvider` e implementações simuladas de Correios, Jadlog e Loggi.
+- [x] Testar isolamento, filtros, paginação, agregações, limites de prazo, cancelamento repetido e alterações concorrentes relevantes.
 
 **Aceite:** consultas retornam apenas dados autorizados; valores são coerentes com os seeders; cancelamentos inválidos não alteram o pedido.
 
@@ -409,6 +409,18 @@ Preencher uma entrada ao encerrar cada fase, no mesmo commit da entrega:
 - Pendências desta fase: nenhuma. Consultas reais de pedidos e dashboard seguem nas fases 07 e 08.
 - Commit de encerramento: `feat: add application layout and login flow`.
 - Próxima fase: 07 — API de pedidos, dashboard e rastreamento (não iniciada).
+
+### Fase 07 — API de pedidos, dashboard e rastreamento
+
+- Status: Concluída.
+- Início e encerramento: 26/09/2026.
+- Entregas: endpoints autenticados de dashboard, listagem, detalhes e cancelamento; Resources; filtros, paginação e ordenação permitida; cálculo mensal em São Paulo; `CancelOrderAction` transacional com bloqueio de linha; contrato e provedores simulados Correios, Jadlog e Loggi.
+- Verificações: Pint aprovado; `bash scripts/test-backend.sh` aprovou 21 testes e 164 assertions, incluindo isolamento, busca, filtros, paginação, métricas, mês São Paulo, endereço mascarado, rastreamento e cancelamento repetido/fora do prazo.
+- Decisões e desvios: busca usa `ILIKE` parametrizado do PostgreSQL; nenhum provedor externo é chamado. O dashboard calcula atraso pela previsão vencida sem alterar o status persistido.
+- Consultas críticas: nenhuma nova; aplicadas D04 e a matriz de estados aprovada.
+- Pendências desta fase: nenhuma. A interface consumirá esses endpoints na fase 08.
+- Commit de encerramento: `feat: implement order dashboard and tracking API`.
+- Próxima fase: 08 — Interface de pedidos e dashboard (não iniciada).
 
 ## Limites de escopo e conclusão do MVP
 
