@@ -21,6 +21,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Prepare Compose file permissions
+        run: |
+          cp .env.example .env
+          printf '\nLOCAL_UID=%s\nLOCAL_GID=%s\n' "$(id -u)" "$(id -g)" >> .env
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22.23.3
@@ -37,10 +42,8 @@ jobs:
       - name: Install backend dependencies from lockfile
         run: docker compose run --rm --no-deps backend composer install --no-interaction --prefer-dist
 
-      - name: Prepare local runtime configuration
+      - name: Prepare runtime configuration
         run: |
-          cp .env.example .env
-          printf '\nLOCAL_UID=%s\nLOCAL_GID=%s\n' "$(id -u)" "$(id -g)" >> .env
           cp backend/.env.example backend/.env
           cp frontend/.env.example frontend/.env
           docker compose run --rm --no-deps backend php artisan key:generate --no-interaction

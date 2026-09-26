@@ -4,7 +4,7 @@
 
 Implementar uma aplicação de demonstração para acompanhamento de pedidos, com dashboard, rastreamento simulado, administração e assistente de IA que consulta dados autorizados do usuário. Este documento define o escopo do MVP, controla a execução e estabelece os critérios de conclusão, da instalação da stack à publicação. As decisões técnicas estão em `docs/architecture.md`.
 
-**Situação em 26/09/2026:** fases 01, 02 e 03 concluídas. Stack local, qualidade automatizada e workflow de CI configurados e validados localmente. Decisões críticas da fase 01 preservadas; nenhum serviço externo provisionado. A primeira execução remota do CI será verificada após o push. Fase 04 ainda não iniciada.
+**Situação em 26/09/2026:** fases 01 e 02 concluídas; fase 03 em andamento. Stack local e verificações de qualidade estão validadas localmente. O primeiro CI remoto revelou uma permissão de escrita no volume do Composer; o workflow foi corrigido e aguarda novo push para validação. Decisões críticas da fase 01 preservadas; nenhum serviço externo provisionado. Fase 04 ainda não iniciada.
 
 ## Regras de execução e commits
 
@@ -50,7 +50,7 @@ Decisões rotineiras, locais e reversíveis, compatíveis com o plano e sem cust
 | --- | --- | --- | --- |
 | 01 | Pré-requisitos e decisões técnicas | — | Concluída |
 | 02 | Monorepo, stack e ambiente local | 01 | Concluída |
-| 03 | Qualidade automatizada e integração contínua | 02 | Concluída |
+| 03 | Qualidade automatizada e integração contínua | 02 | Em andamento |
 | 04 | Modelo de domínio e dados de demonstração | 03 | Pendente |
 | 05 | Autenticação e autorização no backend | 04 | Pendente |
 | 06 | Base visual e autenticação no frontend | 05 | Pendente |
@@ -361,16 +361,16 @@ Preencher uma entrada ao encerrar cada fase, no mesmo commit da entrega:
 
 ### Fase 03 — Qualidade automatizada e integração contínua
 
-- Status: Concluída.
-- Início e encerramento: 26/09/2026.
+- Status: Em andamento.
+- Início: 26/09/2026. Encerramento: pendente da validação remota.
 - Entregas: Pest e plugin Laravel; PostgreSQL `database-test` com volume isolado e executor `scripts/test-backend.sh`; ESLint, Prettier, Vitest, React Testing Library e Playwright no frontend; testes de cliente HTTP, interface, banco de teste e smoke tests; workflow GitHub Actions em `.github/workflows/quality.yml`.
 - Verificações: Pint, Prettier, ESLint, TypeScript, Vitest (5 testes), Pest (4 testes, 15 assertions) e Playwright/Chromium (2 testes) aprovados localmente. O banco de teste executou migrations próprias e o teste confirmou `ordermind_test`; API, frontend e banco de desenvolvimento continuaram separados.
-- Pipeline: o workflow instala pelos lockfiles, configura ambiente efêmero, executa análise, testes e build, inicia API/frontend, consulta `/api/health` e roda Chromium. Relatório Playwright será anexado se houver falha.
-- Decisões e desvios: nenhum custo ou serviço externo. PHPUnit permanece como dependência transitiva do Pest; os testes passam a ser executados pelo Pest. A primeira execução do workflow no GitHub depende do próximo push e deve ser conferida antes de usar a CI como requisito de merge.
+- Pipeline: o workflow instala pelos lockfiles, configura ambiente efêmero, executa análise, testes e build, inicia API/frontend, consulta `/api/health` e roda Chromium. Antes de qualquer comando Docker, cria o `.env` raiz com o UID/GID do runner para que o volume `backend/vendor` seja gravável. Relatório Playwright será anexado se houver falha.
+- Decisões e desvios: nenhum custo ou serviço externo. PHPUnit permanece como dependência transitiva do Pest; os testes passam a ser executados pelo Pest. A primeira execução no GitHub falhou antes de instalar o Composer porque o Compose usou o UID padrão `1000` antes de receber o UID/GID do runner. A correção foi registrada em commit separado, sem reescrever o commit que já foi enviado; o novo push deve ser conferido antes de encerrar a fase.
 - Consultas críticas: nenhuma nova; aplicadas as decisões D01–D04 previamente aprovadas.
-- Pendências desta fase: nenhuma para a entrega local. Cobertura numérica e testes ponta a ponta de produto serão ampliados junto dos fluxos das próximas fases.
-- Commit de encerramento: `ci: configure formatting tests and build checks`.
-- Próxima fase: 04 — Modelo de domínio e dados de demonstração (não iniciada).
+- Pendências desta fase: confirmar a execução remota após o push do ajuste de permissões. Cobertura numérica e testes ponta a ponta de produto serão ampliados junto dos fluxos das próximas fases.
+- Commits: `ci: configure formatting tests and build checks`; correção `fix(ci): match container user to runner`.
+- Próxima fase: 04 — Modelo de domínio e dados de demonstração (não iniciar antes da validação remota).
 
 ## Limites de escopo e conclusão do MVP
 
