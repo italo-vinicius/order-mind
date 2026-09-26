@@ -10,6 +10,8 @@ import { useAuth } from '@/auth/useAuth'
 import { ServerStatus } from '@/components/ServerStatus'
 import { Button } from '@/components/ui/button'
 import { ApiError } from '@/lib/api'
+import { DashboardPage } from '@/pages/DashboardPage'
+import { OrderDetailPage } from '@/pages/OrderDetailPage'
 
 const credentialsSchema = z.object({
   email: z.string().email('Informe um e-mail válido.'),
@@ -162,21 +164,6 @@ function AppLayout() {
     </div>
   )
 }
-function WelcomePage() {
-  const { session } = useAuth()
-  return (
-    <section className="rounded-3xl bg-white p-8 shadow-[0_12px_50px_-30px_#173c3460] sm:p-12">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em]">Sessão iniciada</p>
-      <h1 className="mt-4 text-4xl font-medium tracking-tight">
-        Olá, {session?.user.name.split(' ')[0]}.
-      </h1>
-      <p className="mt-4 max-w-xl text-lg leading-relaxed text-[#52675f]">
-        A base da sua conta está pronta. Na próxima etapa, seus pedidos e rastreamentos aparecerão
-        aqui.
-      </p>
-    </section>
-  )
-}
 function AdminPage() {
   return (
     <section className="rounded-3xl bg-white p-8 shadow-[0_12px_50px_-30px_#173c3460]">
@@ -192,7 +179,8 @@ function ApplicationRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
-          <Route index element={<WelcomePage />} />
+          <Route index element={<DashboardPage />} />
+          <Route path="orders/:id" element={<OrderDetailPage />} />
           <Route element={<AdminRoute />}>
             <Route path="admin" element={<AdminPage />} />
           </Route>

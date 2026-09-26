@@ -23,6 +23,7 @@ class OrderResource extends JsonResource
             'tracking_code' => $this->tracking_code,
             'placed_at' => $this->placed_at?->toISOString(),
             'estimated_delivery_at' => $this->estimated_delivery_at?->toISOString(),
+            'cancellable_until' => $detail ? $this->cancellable_until?->toISOString() : null,
             'delivered_at' => $this->delivered_at?->toISOString(),
             'cancelled_at' => $this->cancelled_at?->toISOString(),
             'is_delayed' => $this->estimated_delivery_at?->isPast() && $this->delivered_at === null && $this->cancelled_at === null,

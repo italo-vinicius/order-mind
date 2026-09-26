@@ -5,14 +5,14 @@ test('allows the customer demo to log in and log out', async ({ page }) => {
   await expect(page.getByText('Conexão disponível', { exact: true })).toBeVisible()
 
   await page.getByRole('button', { name: 'Entrar como cliente demo' }).click()
-  await expect(page.getByText('Sessão iniciada', { exact: true })).toBeVisible()
-  await expect(page.getByText('Olá, Ana.')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Seus pedidos' })).toBeVisible()
+  await expect(page.getByText('Pedidos por status')).toBeVisible()
 
   await page.getByRole('button', { name: 'Sair' }).click()
   await expect(page.getByRole('heading', { name: 'Entrar na demonstração' })).toBeVisible()
 
   await page.getByRole('button', { name: 'Entrar como cliente demo' }).click()
-  await expect(page.getByText('Sessão iniciada', { exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Seus pedidos' })).toBeVisible()
   await page.reload()
   await expect(page.getByRole('heading', { name: 'Entrar na demonstração' })).toBeVisible()
 })

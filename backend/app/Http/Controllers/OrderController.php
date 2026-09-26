@@ -51,11 +51,13 @@ class OrderController extends Controller
         return new OrderResource($order);
     }
 
-    public function cancel(Request $request, Order $order, CancelOrderAction $action): OrderResource
+    public function cancel(Request $request, Order $order, CancelOrderAction $action, TrackingProviderRegistry $tracking): OrderResource
     {
         $this->authorize('cancel', $order);
+        $order = $action->execute($order);
+        $order->setAttribute('tracking_summary', $tracking->summary($order));
 
-        return new OrderResource($action->execute($order));
+        return new OrderResource($order);
     }
 
     public function dashboard(Request $request): JsonResponse

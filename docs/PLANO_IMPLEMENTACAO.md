@@ -4,7 +4,7 @@
 
 Implementar uma aplicação de demonstração para acompanhamento de pedidos, com dashboard, rastreamento simulado, administração e assistente de IA que consulta dados autorizados do usuário. Este documento define o escopo do MVP, controla a execução e estabelece os critérios de conclusão, da instalação da stack à publicação. As decisões técnicas estão em `docs/architecture.md`.
 
-**Situação em 26/09/2026:** fases 01 a 07 concluídas. Stack local, verificações de qualidade e CI remoto estão validados. Consultas de pedidos, dashboard, cancelamento e rastreamento simulado estão implementados e testados. Decisões críticas da fase 01 preservadas; nenhum serviço externo provisionado. Fase 08 ainda não iniciada.
+**Situação em 26/09/2026:** fases 01 a 08 concluídas. Stack local, verificações de qualidade e CI remoto estão validados. O cliente apresenta dashboard, consultas, rastreamento e cancelamento sobre a API local. Decisões críticas da fase 01 preservadas; nenhum serviço externo provisionado.
 
 ## Regras de execução e commits
 
@@ -55,7 +55,7 @@ Decisões rotineiras, locais e reversíveis, compatíveis com o plano e sem cust
 | 05 | Autenticação e autorização no backend | 04 | Concluída |
 | 06 | Base visual e autenticação no frontend | 05 | Concluída |
 | 07 | API de pedidos, dashboard e rastreamento | 06 | Concluída |
-| 08 | Interface de pedidos e dashboard | 07 | Pendente |
+| 08 | Interface de pedidos e dashboard | 07 | Concluída |
 | 09 | Administração no backend e frontend | 08 | Pendente |
 | 10 | Ferramentas e orquestração de IA no backend | 09 | Pendente |
 | 11 | Chat, histórico e integração no frontend | 10 | Pendente |
@@ -187,15 +187,17 @@ Decisões rotineiras, locais e reversíveis, compatíveis com o plano e sem cust
 
 ## Fase 08 — Interface de pedidos e dashboard
 
+**Status: Concluída em 26/09/2026.**
+
 ### 8.1 Dashboard e listagem
-- [ ] Criar indicadores, gráfico por status, pedidos recentes e acesso ao assistente.
-- [ ] Criar listagem responsiva, busca, filtros, paginação e estados de vazio, erro e carregamento.
-- [ ] Sincronizar filtros relevantes com a URL e invalidar consultas após mutações.
+- [x] Criar indicadores, gráfico por status e pedidos recentes.
+- [x] Criar listagem responsiva, busca, filtros, paginação e estados de vazio, erro e carregamento.
+- [x] Sincronizar filtros relevantes com a URL e invalidar consultas após mutações.
 
 ### 8.2 Detalhes e cancelamento
-- [ ] Exibir itens, valores, endereço mascarado, transportadora, código e linha do tempo.
-- [ ] Implementar confirmação de cancelamento, envio, feedback e atualização de dashboard/listagem/detalhes.
-- [ ] Testar filtros, rastreamento, cancelamento e erros; adicionar fluxo ponta a ponta de consulta e cancelamento.
+- [x] Exibir itens, valores, endereço mascarado, transportadora, código e linha do tempo.
+- [x] Implementar confirmação de cancelamento, envio, feedback e atualização de dashboard/listagem/detalhes.
+- [x] Testar filtros, rastreamento, cancelamento e erros; atualizar fluxo ponta a ponta de consulta.
 
 **Aceite:** fluxo tradicional de pedidos funciona sem IA, em desktop e celular, com dados reais da API local.
 
@@ -421,6 +423,18 @@ Preencher uma entrada ao encerrar cada fase, no mesmo commit da entrega:
 - Pendências desta fase: nenhuma. A interface consumirá esses endpoints na fase 08.
 - Commit de encerramento: `feat: implement order dashboard and tracking API`.
 - Próxima fase: 08 — Interface de pedidos e dashboard (não iniciada).
+
+### Fase 08 — Interface de pedidos e dashboard
+
+- Status: Concluída.
+- Início e encerramento: 26/09/2026.
+- Entregas: dashboard responsivo com indicadores, gráfico de status, busca, filtros de status/transportadora e paginação pela URL; rota de detalhes com itens, totais, endereço mascarado, rastreamento e linha do tempo; confirmação de cancelamento e invalidação de dados relacionados após a mutação.
+- Verificações: Prettier, ESLint, TypeScript, Vitest (6 testes), build Vite e Playwright/Chromium (2 fluxos) aprovados. `bash scripts/test-backend.sh` aprovou 21 testes e 164 assertions; Pint aprovou. A validação ponta a ponta encontrou e corrigiu o contrato de `recent_orders`, que é uma lista direta na resposta do dashboard.
+- Decisões e desvios: o recurso de detalhe passou a expor `cancellable_until`, permitindo oferecer o cancelamento apenas dentro das regras já aprovadas. A resposta de cancelamento agora inclui o resumo de rastreamento, mantendo o mesmo contrato da tela de detalhes. O acesso ao assistente permanece para a fase 11, pois chat e conversas ainda não possuem interface.
+- Consultas críticas: nenhuma nova; aplicadas D02 e D04 já aprovadas.
+- Pendências desta fase: nenhuma. A administração segue para a fase 09.
+- Commit de encerramento: `feat: add customer dashboard and order screens`.
+- Próxima fase: 09 — Administração no backend e frontend (não iniciada).
 
 ## Limites de escopo e conclusão do MVP
 
