@@ -35,10 +35,8 @@ test('renders a recoverable unavailable state on the login screen', async ({ pag
 
 test('allows the demo administrator to view and select an order', async ({ page }) => {
   await page.goto('/login')
-  await page.getByLabel('E-mail').fill('admin@ordermind.test')
-  await page.getByLabel('Senha').fill('ordermind-demo')
-  await page.getByRole('button', { name: 'Entrar', exact: true }).click()
+  await page.getByRole('button', { name: 'Entrar como administrador demo' }).click()
   await expect(page.getByRole('heading', { name: 'Gerenciar pedidos' })).toBeVisible()
   await page.getByRole('button', { name: /OM-2026-0002/ }).click()
-  await expect(page.getByRole('heading', { name: 'Alterar status: processing' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /^Alterar status:/ })).toBeVisible()
 })

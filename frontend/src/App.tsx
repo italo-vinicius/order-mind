@@ -54,8 +54,8 @@ function LoginPage() {
       )
     }
   }
-  const enterDemo = () => {
-    form.setValue('email', 'ana@ordermind.test')
+  const enterDemo = (email: string) => {
+    form.setValue('email', email)
     form.setValue('password', 'ordermind-demo')
     void form.handleSubmit(submit)()
   }
@@ -123,8 +123,19 @@ function LoginPage() {
             <p className="mt-1 text-sm text-[#52675f]">
               ana@ordermind.test · senha: ordermind-demo
             </p>
-            <Button className="mt-4" variant="outline" onClick={enterDemo}>
+            <Button
+              className="mt-4"
+              variant="outline"
+              onClick={() => enterDemo('ana@ordermind.test')}
+            >
               Entrar como cliente demo
+            </Button>
+            <Button
+              className="mt-2"
+              variant="outline"
+              onClick={() => enterDemo('admin@ordermind.test')}
+            >
+              Entrar como administrador demo
             </Button>
           </div>
         </div>
