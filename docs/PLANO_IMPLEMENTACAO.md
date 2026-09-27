@@ -4,7 +4,7 @@
 
 Implementar uma aplicação de demonstração para acompanhamento de pedidos, com dashboard, rastreamento simulado, administração e assistente de IA que consulta dados autorizados do usuário. Este documento define o escopo do MVP, controla a execução e estabelece os critérios de conclusão, da instalação da stack à publicação. As decisões técnicas estão em `docs/architecture.md`.
 
-**Situação em 26/09/2026:** fases 01 a 10 concluídas. Stack local, verificações de qualidade e CI remoto estão validados. Clientes acompanham pedidos e administradores criam, editam e atualizam rastreamentos pela API local. O backend do assistente usa ferramentas autorizadas e Gemini no Free Tier; nenhuma despesa foi habilitada.
+**Situação em 26/09/2026:** fases 01 a 11 concluídas. Stack local, verificações de qualidade e CI remoto estão validados. Clientes acompanham pedidos e administradores criam, editam e atualizam rastreamentos pela API local. O backend do assistente usa ferramentas autorizadas e Gemini no Free Tier; nenhuma despesa foi habilitada.
 
 ## Regras de execução e commits
 
@@ -58,7 +58,7 @@ Decisões rotineiras, locais e reversíveis, compatíveis com o plano e sem cust
 | 08 | Interface de pedidos e dashboard | 07 | Concluída |
 | 09 | Administração no backend e frontend | 08 | Concluída |
 | 10 | Ferramentas e orquestração de IA no backend | 09 | Concluída |
-| 11 | Chat, histórico e integração no frontend | 10 | Pendente |
+| 11 | Chat, histórico e integração no frontend | 10 | Concluída |
 | 12 | Revisão integrada e observabilidade | 11 | Pendente |
 | 13 | Preparação de produção | 12 | Pendente |
 | 14 | Deploy, validação pública e documentação | 13 | Pendente |
@@ -254,15 +254,29 @@ Decisão aprovada: cada alteração administrativa de status cria evento padrão
 
 ## Fase 11 — Chat, histórico e integração no frontend
 
+**Status: Concluída em 26/09/2026.**
+
 ### 11.1 Assistente
-- [ ] Criar chat, perguntas sugeridas, nova conversa, histórico, carregamento e mensagens de falha/cota.
-- [ ] Exibir links para pedidos retornados pela API, conteúdo renderizado com segurança e aviso de dados fictícios.
-- [ ] Evitar envio duplicado; definir nova tentativa sem duplicar mensagens já persistidas e manter pedidos acessíveis quando a IA falhar.
+- [x] Criar chat, perguntas sugeridas, nova conversa, histórico, carregamento e mensagens de falha/cota.
+- [x] Exibir links para pedidos retornados pela API, conteúdo renderizado com segurança e aviso de dados fictícios.
+- [x] Evitar envio duplicado; definir nova tentativa sem duplicar mensagens já persistidas e manter pedidos acessíveis quando a IA falhar.
 
 ### 11.2 Administração e testes
-- [ ] Adicionar consulta paginada de logs de ferramentas no painel administrativo, sem segredos ou argumentos sensíveis.
-- [ ] Testar envio, resposta, troca de conversa, histórico vazio, falha e repetição controlada.
-- [ ] Adicionar testes ponta a ponta do chat com provedor simulado e realizar verificação manual com integração real.
+- [x] Adicionar consulta paginada de logs de ferramentas no painel administrativo, sem segredos ou argumentos sensíveis.
+- [x] Testar envio, resposta, troca de conversa, histórico vazio, falha e repetição controlada.
+- [x] Adicionar testes ponta a ponta do chat com provedor simulado e realizar verificação manual com integração real.
+
+**Execução concluída em 26/09/2026:** foram entregues as telas de assistente, histórico e nova conversa, com sugestões, carregamento, aviso de dados fictícios, texto renderizado como texto simples e links de números de pedido para a busca autorizada. Após erro do provedor, a pergunta permanece no campo e a interface pede atualização da conversa antes de novo envio: ela reconcilia a eventual persistência já feita pelo backend e não repete a solicitação automaticamente. A auditoria administrativa mostra somente data, cliente, nome da ferramenta e resultado, sem argumentos nem saídas de ferramentas. O fluxo real local enviou uma pergunta fictícia ao backend configurado; a disponibilidade do Gemini Free Tier continua variável e o estado 503 é exibido de forma controlada.
+
+**Verificações:** Prettier, TypeScript, ESLint, Vitest (8 testes), build Vite, `bash scripts/test-backend.sh` (32 testes e 227 assertions) e Playwright/Chromium (4 fluxos) aprovados. Os fluxos de navegador cobrem chat com provedor simulado, link para pedido, estado indisponível, login e auditoria administrativa. O build emite somente o aviso conhecido de chunk acima de 500 kB; não falhou.
+
+**Decisões e desvios:** não houve nova decisão crítica. A repetição automática foi evitada porque o contrato atual pode persistir a pergunta antes de uma falha do provedor; a atualização manual é reversível e impede duplicação. A integração real preserva o modelo, Free Tier e limites aprovados na fase 10.
+
+**Consultas críticas:** nenhuma; aplicadas D02 e D05 já aprovadas.
+
+**Pendências desta fase:** nenhuma. Otimização de divisão de bundle, observabilidade e revisão aprofundada seguem para a fase 12.
+
+**Commit de encerramento:** `feat: add assistant chat history and tool log screens`.
 
 **Aceite:** usuário consulta seus pedidos em linguagem natural, recupera conversas e entende falhas; administrador consulta logs autorizados.
 

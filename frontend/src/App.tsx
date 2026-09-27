@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { LogOut, Package } from 'lucide-react'
+import { Bot, ClipboardList, LogOut, Package } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, Navigate, Outlet, Route, Routes, useNavigate } from 'react-router-dom'
@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/button'
 import { ApiError } from '@/lib/api'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { AdminOrdersPage } from '@/pages/AdminOrdersPage'
+import { AdminToolLogsPage } from '@/pages/AdminToolLogsPage'
+import { AssistantPage } from '@/pages/AssistantPage'
 import { OrderDetailPage } from '@/pages/OrderDetailPage'
 
 const credentialsSchema = z.object({
@@ -154,9 +156,26 @@ function AppLayout() {
   return (
     <div className="min-h-svh bg-[#f5f5ef] text-[#173c34]">
       <header className="border-b border-[#173c34]/10 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 sm:px-10">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-4 sm:px-10">
           <Brand />
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {session?.user.role === 'customer' ? (
+              <Link className="text-sm underline" to="/assistant">
+                <Bot className="mr-1 inline size-4" aria-hidden="true" />
+                Assistente
+              </Link>
+            ) : null}
+            {session?.user.role === 'admin' ? (
+              <>
+                <Link className="text-sm underline" to="/admin">
+                  Pedidos
+                </Link>
+                <Link className="text-sm underline" to="/admin/ai-logs">
+                  <ClipboardList className="mr-1 inline size-4" aria-hidden="true" />
+                  IA
+                </Link>
+              </>
+            ) : null}
             <span className="hidden text-right text-sm sm:block">
               <strong className="block font-medium">{session?.user.name}</strong>
               <span className="text-xs text-[#52675f]">
@@ -184,8 +203,10 @@ function ApplicationRoutes() {
         <Route element={<AppLayout />}>
           <Route index element={<DashboardPage />} />
           <Route path="orders/:id" element={<OrderDetailPage />} />
+          <Route path="assistant" element={<AssistantPage />} />
           <Route element={<AdminRoute />}>
             <Route path="admin" element={<AdminOrdersPage />} />
+            <Route path="admin/ai-logs" element={<AdminToolLogsPage />} />
           </Route>
         </Route>
       </Route>
