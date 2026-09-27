@@ -4,7 +4,7 @@
 
 Implementar uma aplicação de demonstração para acompanhamento de pedidos, com dashboard, rastreamento simulado, administração e assistente de IA que consulta dados autorizados do usuário. Este documento define o escopo do MVP, controla a execução e estabelece os critérios de conclusão, da instalação da stack à publicação. As decisões técnicas estão em `docs/architecture.md`.
 
-**Situação em 26/09/2026:** fases 01 a 09 concluídas. Stack local, verificações de qualidade e CI remoto estão validados. Clientes acompanham pedidos e administradores criam, editam e atualizam rastreamentos pela API local. Decisões críticas da fase 01 preservadas; nenhum serviço externo provisionado.
+**Situação em 26/09/2026:** fases 01 a 10 concluídas. Stack local, verificações de qualidade e CI remoto estão validados. Clientes acompanham pedidos e administradores criam, editam e atualizam rastreamentos pela API local. O backend do assistente usa ferramentas autorizadas e Gemini no Free Tier; nenhuma despesa foi habilitada.
 
 ## Regras de execução e commits
 
@@ -57,7 +57,7 @@ Decisões rotineiras, locais e reversíveis, compatíveis com o plano e sem cust
 | 07 | API de pedidos, dashboard e rastreamento | 06 | Concluída |
 | 08 | Interface de pedidos e dashboard | 07 | Concluída |
 | 09 | Administração no backend e frontend | 08 | Concluída |
-| 10 | Ferramentas e orquestração de IA no backend | 09 | Pendente |
+| 10 | Ferramentas e orquestração de IA no backend | 09 | Concluída |
 | 11 | Chat, histórico e integração no frontend | 10 | Pendente |
 | 12 | Revisão integrada e observabilidade | 11 | Pendente |
 | 13 | Preparação de produção | 12 | Pendente |
@@ -225,22 +225,28 @@ Decisão aprovada: cada alteração administrativa de status cria evento padrão
 
 ## Fase 10 — Ferramentas e orquestração de IA no backend
 
+**Status: Concluída em 26/09/2026.** Decisão crítica aprovada: usar `gemini-3.7-flash` exclusivamente no Free Tier, sem ativar faturamento ou ferramentas gerenciadas que possam gerar custo. A chave fica somente em `backend/.env`, nunca no repositório. O Free Tier pode usar o conteúdo para melhoria de produto; o MVP envia somente dados fictícios e a futura interface exibirá esse aviso.
+
 ### 10.1 Ferramentas autorizadas
-- [ ] Implementar `ToolRegistry` e as cinco ferramentas: `get_latest_order`, `get_order_details`, `list_delayed_orders`, `calculate_monthly_spending` e `check_cancellation_eligibility`.
-- [ ] Validar argumentos, aplicar contexto do usuário no servidor e devolver somente campos necessários.
-- [ ] Manter as ferramentas do MVP somente para consulta; cancelamento permanece no fluxo explícito da interface.
+- [x] Implementar `ToolRegistry` e as cinco ferramentas: `get_latest_order`, `get_order_details`, `list_delayed_orders`, `calculate_monthly_spending` e `check_cancellation_eligibility`.
+- [x] Validar argumentos, aplicar contexto do usuário no servidor e devolver somente campos necessários.
+- [x] Manter as ferramentas do MVP somente para consulta; cancelamento permanece no fluxo explícito da interface.
 
 ### 10.2 Gemini e conversas
-- [ ] Configurar cliente Gemini com modelo por variável de ambiente, limites, timeout e tratamento de indisponibilidade/cota.
-- [ ] Implementar `OrderAssistant`: mensagem → solicitação de ferramenta → validação → execução → resultado → resposta, limitando iterações e tamanho do histórico.
-- [ ] Persistir conversas, mensagens e logs sanitizados; implementar criação, listagem, detalhes e envio de mensagens com Policies.
-- [ ] Implementar `GenerateConversationTitleJob`, processamento local e comportamento de contingência definido para produção.
-- [ ] Implementar `GET /api/admin/ai-tool-logs` com paginação e acesso restrito.
+- [x] Configurar cliente Gemini com modelo por variável de ambiente, limites, timeout e tratamento de indisponibilidade/cota.
+- [x] Implementar `OrderAssistant`: mensagem → solicitação de ferramenta → validação → execução → resultado → resposta, limitando iterações e tamanho do histórico.
+- [x] Persistir conversas, mensagens e logs sanitizados; implementar criação, listagem, detalhes e envio de mensagens com Policies.
+- [x] Implementar `GenerateConversationTitleJob`, processamento local e comportamento de contingência definido para produção.
+- [x] Implementar `GET /api/admin/ai-tool-logs` com paginação e acesso restrito.
 
 ### 10.3 Testes
-- [ ] Simular respostas do provedor, argumentos inválidos, ferramenta desconhecida, ausência de dados, timeout e excesso de chamadas.
-- [ ] Testar acesso cruzado a conversas/pedidos, tentativas de contornar regras e persistência consistente em falhas.
-- [ ] Instruir o assistente a responder com dados das ferramentas e admitir informação indisponível; não depender do prompt para autorização.
+- [x] Simular respostas do provedor, argumentos inválidos, ferramenta desconhecida, ausência de dados, timeout e excesso de chamadas.
+- [x] Testar acesso cruzado a conversas/pedidos, tentativas de contornar regras e persistência consistente em falhas.
+- [x] Instruir o assistente a responder com dados das ferramentas e admitir informação indisponível; não depender do prompt para autorização.
+
+**Execução concluída em 26/09/2026:** foram entregues as cinco ferramentas somente de leitura, `ToolRegistry`, cliente Gemini com timeout, histórico limitado e no máximo três iterações, conversas e mensagens protegidas por Policy, logs administrativos paginados e job de título. A fila continua local em desenvolvimento; em produção, o título é processado de forma síncrona com fallback `Nova conversa`. A validação real confirmou chave e modelo disponíveis, uma solicitação de ferramenta aceita e execução no contexto do cliente. A resposta final do modelo encontrou HTTP 503 de alta demanda, que retorna indisponibilidade controlada sem expor dados; testes simulam esse cenário, quota, conexão, argumentos inválidos e chamadas desconhecidas. `bash scripts/test-backend.sh` aprovou 32 testes e 227 assertions; Pint e `git diff --check` também passaram. Nenhum faturamento, ferramenta gerenciada ou segredo foi versionado.
+
+**Commit de encerramento:** `feat: implement authorized AI assistant backend`.
 
 **Aceite:** testes determinísticos validam as cinco ferramentas e os limites; uma integração controlada com Gemini confirma o contrato sem expor dados de outros usuários.
 

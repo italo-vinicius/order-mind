@@ -2,7 +2,7 @@
 
 Aplicação de demonstração para acompanhar pedidos e consultar informações com um assistente de IA.
 
-**Estado atual:** fundação local da fase 02. A página inicial consulta a saúde da API, que verifica o PostgreSQL. Login, pedidos, administração e IA serão implementados nas próximas fases; ainda não há usuário de demonstração ou deploy público.
+**Estado atual:** fases 01 a 10 concluídas. Login, pedidos, administração e o backend do assistente funcionam localmente; a interface de chat será criada na fase 11. Ainda não há deploy público.
 
 ## Stack e organização
 
@@ -44,6 +44,17 @@ O banco usa valores públicos exclusivos do desenvolvimento definidos no Compose
 Se alterar `API_PORT` ou `FRONTEND_PORT` na raiz, ajuste também `APP_URL`/`FRONTEND_URL` no backend e `VITE_API_URL` no frontend. O CORS permite somente a origem exata de `FRONTEND_URL`; abra a interface por `localhost`, conforme os exemplos. Reinicie os serviços após mudar variáveis.
 
 Em Linux, o setup grava seu UID/GID na configuração local para evitar arquivos pertencentes a root. Se houver erro de permissão, confira `LOCAL_UID` e `LOCAL_GID`. Não é necessário usar PHP ou npm globais.
+
+### Gemini local
+
+O assistente usa `gemini-3.7-flash` exclusivamente no Free Tier, sem faturamento, Google Search ou ferramentas gerenciadas. Crie uma chave no Google AI Studio e adicione-a apenas ao arquivo ignorado `backend/.env`:
+
+```dotenv
+GEMINI_API_KEY=sua_chave_local
+GEMINI_MODEL=gemini-3.7-flash
+```
+
+Reinicie o serviço `backend` após alterar essas variáveis. Não envie a chave por chat, não a versione e não use o prefixo `VITE_`. O Free Tier pode usar o conteúdo para melhoria do produto; a demonstração envia somente dados fictícios.
 
 ## Comandos de desenvolvimento
 
@@ -90,4 +101,4 @@ Pest verifica a conexão PostgreSQL exclusiva de testes, saúde, indisponibilida
 
 Este Compose e o servidor `artisan serve` são exclusivos de desenvolvimento. A imagem de produção e o deploy serão preparados nas fases 13–14. Não execute comandos que removam volumes se quiser manter os dados locais.
 
-Segredos ficam em arquivos `.env` ignorados. Somente `VITE_API_URL` é exposta ao frontend. Chaves Gemini nunca devem usar o prefixo `VITE_`. Nesta fase, nenhuma chamada de IA ou serviço pago é necessária.
+Segredos ficam em arquivos `.env` ignorados. Somente `VITE_API_URL` é exposta ao frontend. Chaves Gemini nunca devem usar o prefixo `VITE_`. O projeto não habilita faturamento nem recursos de IA pagos.

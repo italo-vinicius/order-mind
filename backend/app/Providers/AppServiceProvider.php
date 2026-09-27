@@ -2,6 +2,15 @@
 
 namespace App\Providers;
 
+use App\AI\Contracts\AssistantProvider;
+use App\AI\GeminiAssistantProvider;
+use App\AI\Tools\CalculateMonthlySpendingTool;
+use App\AI\Tools\CheckCancellationEligibilityTool;
+use App\AI\Tools\GetLatestOrderTool;
+use App\AI\Tools\GetOrderDetailsTool;
+use App\AI\Tools\ListDelayedOrdersTool;
+use App\AI\Tools\ToolRegistry;
+use App\AI\UnavailableAssistantProvider;
 use App\Enums\UserRole;
 use App\Models\Conversation;
 use App\Models\Order;
@@ -20,7 +29,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(AssistantProvider::class, fn (): AssistantProvider => filled(config('services.gemini.api_key')) && filled(config('services.gemini.model')) ? new GeminiAssistantProvider : new UnavailableAssistantProvider);
+        $this->app->singleton(ToolRegistry::class, fn (): ToolRegistry => new ToolRegistry([
+            new GetLatestOrderTool,
+            new GetOrderDetailsTool,
+            new ListDelayedOrdersTool,
+            new CalculateMonthlySpendingTool,
+            new CheckCancellationEligibilityTool,
+        ]));
     }
 
     /**

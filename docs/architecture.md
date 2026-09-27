@@ -2,7 +2,7 @@
 
 ## Estado do documento
 
-Fases 01 a 04 consolidadas em 26/09/2026. Filas, sessão, regras de negócio e matriz de estados aprovadas pelo usuário. Fundação local e domínio de pedidos foram instalados e validados com Docker; nenhum serviço externo provisionado. Login e integração Gemini continuam nas fases seguintes.
+Fases 01 a 10 consolidadas em 26/09/2026. Filas, sessão, regras de negócio, matriz de estados e uso gratuito do Gemini foram aprovados pelo usuário. Fundação, pedidos, administração e backend do assistente foram validados com Docker; nenhuma cobrança foi habilitada. A interface do chat continua na fase 11.
 
 ## Arquitetura prevista
 
@@ -135,8 +135,9 @@ O plano prevê `GenerateConversationTitleJob`. Um worker separado no Render não
 | D02 | Token em memória, duas horas, logout revoga; recarregar exige login | Aprovado via Ask Question em 26/09/2026 |
 | D03 | Remoto GitHub informado pelo usuário | Configurado e acesso de leitura validado em 26/09/2026 |
 | D04 | BRL, UTC/São Paulo, gasto por placed_at sem cancelados, atraso por previsão vencida, cancelamento em pending_payment/processing até o prazo inclusive | Aprovado via Ask Question em 26/09/2026 |
+| D05 | Gemini `gemini-3.7-flash` somente em Free Tier; sem faturamento nem ferramentas gerenciadas | Aprovado via Ask Question em 26/09/2026; dados do MVP são fictícios |
 
-As quatro consultas foram resolvidas. O encerramento da fase 01 registra este documento e o plano no commit `docs: define environment and architecture decisions`. A fase 02 começa com o scaffold e a instalação isolada dos runtimes definidos; nenhuma mudança no PHP global é necessária.
+As decisões críticas registradas foram resolvidas. O encerramento da fase 01 registra este documento e o plano no commit `docs: define environment and architecture decisions`. A fase 02 começa com o scaffold e a instalação isolada dos runtimes definidos; nenhuma mudança no PHP global é necessária.
 
 
 ## Entrega da fase 02 — ambiente local

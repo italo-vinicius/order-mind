@@ -2,6 +2,15 @@
 
 return [
 
+    'gemini' => [
+        'api_key' => env('GEMINI_API_KEY'),
+        'model' => env('GEMINI_MODEL'),
+        'timeout' => (int) env('GEMINI_TIMEOUT', 10),
+        'max_tool_iterations' => (int) env('GEMINI_MAX_TOOL_ITERATIONS', 3),
+        'history_messages' => (int) env('GEMINI_HISTORY_MESSAGES', 10),
+        'history_characters' => (int) env('GEMINI_HISTORY_CHARACTERS', 1200),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services
