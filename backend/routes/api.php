@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminOrderController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\OrderController;
@@ -19,5 +20,12 @@ Route::middleware('auth:sanctum')->group(function (): void {
 
     Route::prefix('admin')->middleware('can:access-admin')->group(function (): void {
         Route::get('/access', fn () => response()->noContent());
+        Route::get('/customers', [AdminOrderController::class, 'customers']);
+        Route::get('/orders', [AdminOrderController::class, 'index']);
+        Route::post('/orders', [AdminOrderController::class, 'store']);
+        Route::get('/orders/{order}', [AdminOrderController::class, 'show']);
+        Route::patch('/orders/{order}', [AdminOrderController::class, 'update']);
+        Route::patch('/orders/{order}/status', [AdminOrderController::class, 'updateStatus']);
+        Route::post('/orders/{order}/tracking-events', [AdminOrderController::class, 'storeTrackingEvent']);
     });
 });

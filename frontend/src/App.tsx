@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { LogOut, Package, ShieldCheck } from 'lucide-react'
+import { LogOut, Package } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, Navigate, Outlet, Route, Routes, useNavigate } from 'react-router-dom'
@@ -11,6 +11,7 @@ import { ServerStatus } from '@/components/ServerStatus'
 import { Button } from '@/components/ui/button'
 import { ApiError } from '@/lib/api'
 import { DashboardPage } from '@/pages/DashboardPage'
+import { AdminOrdersPage } from '@/pages/AdminOrdersPage'
 import { OrderDetailPage } from '@/pages/OrderDetailPage'
 
 const credentialsSchema = z.object({
@@ -164,15 +165,6 @@ function AppLayout() {
     </div>
   )
 }
-function AdminPage() {
-  return (
-    <section className="rounded-3xl bg-white p-8 shadow-[0_12px_50px_-30px_#173c3460]">
-      <ShieldCheck className="size-8 text-[#3b7039]" aria-hidden="true" />
-      <h1 className="mt-4 text-3xl font-medium">Área administrativa</h1>
-      <p className="mt-3 text-[#52675f]">A gestão de pedidos será adicionada na fase 09.</p>
-    </section>
-  )
-}
 function ApplicationRoutes() {
   return (
     <Routes>
@@ -182,7 +174,7 @@ function ApplicationRoutes() {
           <Route index element={<DashboardPage />} />
           <Route path="orders/:id" element={<OrderDetailPage />} />
           <Route element={<AdminRoute />}>
-            <Route path="admin" element={<AdminPage />} />
+            <Route path="admin" element={<AdminOrdersPage />} />
           </Route>
         </Route>
       </Route>

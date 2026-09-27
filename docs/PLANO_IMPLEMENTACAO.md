@@ -4,7 +4,7 @@
 
 Implementar uma aplicação de demonstração para acompanhamento de pedidos, com dashboard, rastreamento simulado, administração e assistente de IA que consulta dados autorizados do usuário. Este documento define o escopo do MVP, controla a execução e estabelece os critérios de conclusão, da instalação da stack à publicação. As decisões técnicas estão em `docs/architecture.md`.
 
-**Situação em 26/09/2026:** fases 01 a 08 concluídas. Stack local, verificações de qualidade e CI remoto estão validados. O cliente apresenta dashboard, consultas, rastreamento e cancelamento sobre a API local. Decisões críticas da fase 01 preservadas; nenhum serviço externo provisionado.
+**Situação em 26/09/2026:** fases 01 a 09 concluídas. Stack local, verificações de qualidade e CI remoto estão validados. Clientes acompanham pedidos e administradores criam, editam e atualizam rastreamentos pela API local. Decisões críticas da fase 01 preservadas; nenhum serviço externo provisionado.
 
 ## Regras de execução e commits
 
@@ -56,7 +56,7 @@ Decisões rotineiras, locais e reversíveis, compatíveis com o plano e sem cust
 | 06 | Base visual e autenticação no frontend | 05 | Concluída |
 | 07 | API de pedidos, dashboard e rastreamento | 06 | Concluída |
 | 08 | Interface de pedidos e dashboard | 07 | Concluída |
-| 09 | Administração no backend e frontend | 08 | Pendente |
+| 09 | Administração no backend e frontend | 08 | Concluída |
 | 10 | Ferramentas e orquestração de IA no backend | 09 | Pendente |
 | 11 | Chat, histórico e integração no frontend | 10 | Pendente |
 | 12 | Revisão integrada e observabilidade | 11 | Pendente |
@@ -205,15 +205,19 @@ Decisões rotineiras, locais e reversíveis, compatíveis com o plano e sem cust
 
 ## Fase 09 — Administração no backend e frontend
 
+**Status: Concluída em 26/09/2026.**
+
+Decisão aprovada: cada alteração administrativa de status cria evento padrão no horário atual e preenche `delivered_at` ou `cancelled_at` ao entrar no estado terminal. Eventos adicionais continuam sendo incluídos em ação própria.
+
 ### 9.1 API administrativa
-- [ ] Implementar listagem, criação e atualização de pedidos, além de inclusão de eventos de rastreamento, nas rotas `/api/admin/orders` do plano.
-- [ ] Implementar `UpdateOrderStatusAction`, validação das transições e consistência entre status, datas e eventos.
-- [ ] Testar permissões administrativas, payloads inválidos e transições proibidas.
+- [x] Implementar listagem, criação e atualização de pedidos, além de inclusão de eventos de rastreamento, nas rotas `/api/admin/orders` do plano.
+- [x] Implementar `UpdateOrderStatusAction`, validação das transições e consistência entre status, datas e eventos.
+- [x] Testar permissões administrativas, payloads inválidos e transições proibidas.
 
 ### 9.2 Painel
-- [ ] Criar listagem e formulários de criação/edição de pedidos, alteração de status e inclusão de eventos.
-- [ ] Exibir validações da API, confirmações apropriadas e feedback de sucesso/erro.
-- [ ] Testar o fluxo administrador altera pedido → cliente visualiza atualização; reservar a visualização de logs de IA para a fase 11.
+- [x] Criar listagem e formulários de criação/edição de pedidos, alteração de status e inclusão de eventos.
+- [x] Exibir validações da API, confirmações apropriadas e feedback de sucesso/erro.
+- [x] Testar o fluxo administrador altera pedido → cliente visualiza atualização; reservar a visualização de logs de IA para a fase 11.
 
 **Aceite:** administrador gerencia pedidos e rastreamento; cliente recebe as alterações e continua sem acesso administrativo.
 
@@ -435,6 +439,18 @@ Preencher uma entrada ao encerrar cada fase, no mesmo commit da entrega:
 - Pendências desta fase: nenhuma. A administração segue para a fase 09.
 - Commit de encerramento: `feat: add customer dashboard and order screens`.
 - Próxima fase: 09 — Administração no backend e frontend (não iniciada).
+
+### Fase 09 — Administração no backend e frontend
+
+- Status: Concluída.
+- Início e encerramento: 26/09/2026.
+- Entregas: rotas administrativas protegidas para clientes, pedidos, edição, transição de status e eventos; Requests, Resources e ações transacionais; painel para criar pedido, editar frete/desconto/rastreio, escolher somente transições permitidas e inserir eventos adicionais.
+- Verificações: Pint aprovado; `bash scripts/test-backend.sh` aprovou 25 testes e 198 assertions. Prettier, ESLint, TypeScript, Vitest (6 testes), build Vite e Playwright/Chromium (3 fluxos) aprovados. A suíte cobre 403 para cliente, criação e recálculo de totais, atualização de itens preservando frete/desconto, transições proibidas, data terminal, evento automático, evento manual e leitura posterior pelo cliente.
+- Decisões e desvios: pedidos criados pelo painel começam em `pending_payment`, o primeiro estado da matriz aprovada. Alteração administrativa de status gera evento padrão no instante atual, em `Administração OrderMind`; entrega e cancelamento preenchem respectivamente `delivered_at` e `cancelled_at`. Eventos manuais não alteram o status do pedido.
+- Consultas críticas: em 26/09/2026, usuário aprovou a opção 1: evento automático e datas terminais automáticas em toda alteração administrativa de status.
+- Pendências desta fase: nenhuma. Logs de IA permanecem na fase 11.
+- Commit de encerramento: `feat: implement order administration`.
+- Próxima fase: 10 — Ferramentas e orquestração de IA no backend (não iniciada).
 
 ## Limites de escopo e conclusão do MVP
 
