@@ -17,6 +17,15 @@ class HealthTest extends TestCase
             ->assertExactJson(['data' => ['status' => 'ok', 'database' => 'ok']]);
     }
 
+    public function test_api_responses_include_a_generated_request_identifier(): void
+    {
+        DB::shouldReceive('select')->once()->with('SELECT 1')->andReturn([]);
+
+        $this->getJson('/api/health')
+            ->assertOk()
+            ->assertHeader('X-Request-ID');
+    }
+
     public function test_database_failure_returns_503_without_connection_details(): void
     {
         DB::shouldReceive('select')->once()->andThrow(new RuntimeException('private connection details'));

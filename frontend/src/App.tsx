@@ -155,6 +155,12 @@ function AppLayout() {
   }
   return (
     <div className="min-h-svh bg-[#f5f5ef] text-[#173c34]">
+      <a
+        href="#main-content"
+        className="sr-only fixed left-4 top-4 z-50 rounded-lg bg-white px-3 py-2 text-sm font-medium shadow focus:not-sr-only"
+      >
+        Pular para o conteúdo
+      </a>
       <header className="border-b border-[#173c34]/10 bg-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-4 sm:px-10">
           <Brand />
@@ -189,7 +195,7 @@ function AppLayout() {
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-6 py-10 sm:px-10">
+      <main id="main-content" tabIndex={-1} className="mx-auto max-w-6xl px-6 py-10 sm:px-10">
         <Outlet />
       </main>
     </div>

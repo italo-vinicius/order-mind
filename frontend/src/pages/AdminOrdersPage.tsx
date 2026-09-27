@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
 import { useAuth } from '@/auth/useAuth'
 import { Button } from '@/components/ui/button'
+import { LoadingState } from '@/components/LoadingState'
 import { ApiError } from '@/lib/api'
 import {
   parseAdminCustomers,
@@ -436,7 +437,7 @@ export function AdminOrdersPage() {
         <article className="overflow-hidden rounded-2xl bg-white shadow-sm">
           <h2 className="border-b p-5 text-lg font-medium">Pedidos</h2>
           {orders.isLoading ? (
-            <p className="p-5">Carregando pedidos…</p>
+            <LoadingState label="Carregando pedidos…" />
           ) : orders.isError ? (
             <p role="alert" className="p-5">
               Não foi possível carregar pedidos.
@@ -457,7 +458,7 @@ export function AdminOrdersPage() {
           )}
         </article>
         <div>
-          {detail.isLoading && <p>Carregando pedido…</p>}
+          {detail.isLoading && <LoadingState label="Carregando pedido…" />}
           {detail.isError && <p role="alert">Não foi possível carregar o pedido.</p>}
           {detail.data && (
             <OrderEditor key={detail.data.id} order={detail.data} onChanged={refresh} />

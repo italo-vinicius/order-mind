@@ -4,7 +4,7 @@
 
 Implementar uma aplicação de demonstração para acompanhamento de pedidos, com dashboard, rastreamento simulado, administração e assistente de IA que consulta dados autorizados do usuário. Este documento define o escopo do MVP, controla a execução e estabelece os critérios de conclusão, da instalação da stack à publicação. As decisões técnicas estão em `docs/architecture.md`.
 
-**Situação em 26/09/2026:** fases 01 a 11 concluídas. Stack local, verificações de qualidade e CI remoto estão validados. Clientes acompanham pedidos e administradores criam, editam e atualizam rastreamentos pela API local. O backend do assistente usa ferramentas autorizadas e Gemini no Free Tier; nenhuma despesa foi habilitada.
+**Situação em 26/09/2026:** fases 01 a 12 concluídas. Stack local, verificações de qualidade e CI remoto estão validados. Clientes acompanham pedidos e administradores criam, editam e atualizam rastreamentos pela API local. O backend do assistente usa ferramentas autorizadas e Gemini no Free Tier; nenhuma despesa foi habilitada.
 
 ## Regras de execução e commits
 
@@ -59,7 +59,7 @@ Decisões rotineiras, locais e reversíveis, compatíveis com o plano e sem cust
 | 09 | Administração no backend e frontend | 08 | Concluída |
 | 10 | Ferramentas e orquestração de IA no backend | 09 | Concluída |
 | 11 | Chat, histórico e integração no frontend | 10 | Concluída |
-| 12 | Revisão integrada e observabilidade | 11 | Pendente |
+| 12 | Revisão integrada e observabilidade | 11 | Concluída |
 | 13 | Preparação de produção | 12 | Pendente |
 | 14 | Deploy, validação pública e documentação | 13 | Pendente |
 
@@ -284,16 +284,32 @@ Decisão aprovada: cada alteração administrativa de status cria evento padrão
 
 ## Fase 12 — Revisão integrada e observabilidade
 
+**Status: Concluída em 26/09/2026.**
+
 ### 12.1 Robustez e segurança
-- [ ] Revisar Policies, validações, CORS, limites de requisição, limpeza de sessão e ausência de segredos no código/build/logs.
-- [ ] Adicionar logs estruturados com `request_id`, duração de endpoints e de ferramentas, evitando tokens, senhas e dados sensíveis.
-- [ ] Revisar consultas para evitar carregamentos repetidos desnecessários e garantir paginação/limites.
+- [x] Revisar Policies, validações, CORS, limites de requisição, limpeza de sessão e ausência de segredos no código/build/logs.
+- [x] Adicionar logs estruturados com `request_id`, duração de endpoints e de ferramentas, evitando tokens, senhas e dados sensíveis.
+- [x] Revisar consultas para evitar carregamentos repetidos desnecessários e garantir paginação/limites.
 
 ### 12.2 Experiência e regressão
-- [ ] Revisar teclado, foco, rótulos, contraste, layouts móveis, skeletons e estados vazios/erro.
-- [ ] Validar API iniciando, banco indisponível, Gemini indisponível e sessão expirada.
-- [ ] Completar regressão de autenticação, isolamento, pedidos, administração e chat; revisar coerência dos dados demo.
-- [ ] Executar lint, tipos, testes backend/frontend/ponta a ponta e build; corrigir falhas antes de encerrar.
+- [x] Revisar teclado, foco, rótulos, contraste, layouts móveis, skeletons e estados vazios/erro.
+- [x] Validar API iniciando, banco indisponível, Gemini indisponível e sessão expirada.
+- [x] Completar regressão de autenticação, isolamento, pedidos, administração e chat; revisar coerência dos dados demo.
+- [x] Executar lint, tipos, testes backend/frontend/ponta a ponta e build; corrigir falhas antes de encerrar.
+
+**Execução concluída em 26/09/2026:** foi incluído middleware global de contexto que gera `X-Request-ID` e registra método, rota sem query string, status e duração de cada requisição. Ferramentas da IA registram nome, resultado e duração sob o mesmo identificador, sem token, senha, cabeçalho, corpo, argumentos ou saída da ferramenta. Mensagens do assistente agora têm limite de 10 por minuto por conta autenticada. CORS expõe somente o identificador de rastreio; as Policies, Requests, paginações e limites existentes foram revisados. A lista administrativa de clientes recebeu teto de 100 itens.
+
+**Experiência e regressão:** telas de carregamento passaram a anunciar estado ocupado e exibir skeleton; foi incluído atalho de teclado para pular ao conteúdo principal. Os fluxos preservam mensagens de erro e estados vazios. A suíte cobre banco indisponível, Gemini indisponível, expiração/revogação de token, isolamento, limites do assistente, administração, pedidos e chat. A revisão de fontes rastreadas não encontrou chaves Gemini ou tokens reais; arquivos `.env` permanecem ignorados.
+
+**Verificações:** Pint, `bash scripts/test-backend.sh` (34 testes e 241 assertions), Prettier, TypeScript, Vitest (8 testes), ESLint, build Vite e Playwright/Chromium (5 fluxos, incluindo viewport de 390 px) aprovados. O build emite apenas o aviso conhecido de chunk acima de 500 kB, sem falhar.
+
+**Decisões e desvios:** nenhuma decisão crítica nova. O limite de 10 mensagens/minuto é local, reversível e protege a franquia gratuita já aprovada; não houve mudança de provedor, plano ou armazenamento de credenciais. A alteração de permissão em `scripts/setup.sh` foi preservada fora deste commit por ser uma modificação local preexistente.
+
+**Consultas críticas:** nenhuma; aplicadas D01, D02 e D05 já aprovadas.
+
+**Pendências desta fase:** nenhuma. Imagem de produção, configuração de variáveis e procedimento de publicação seguem para a fase 13.
+
+**Commit de encerramento:** `fix: harden application flows and observability`.
 
 **Aceite:** fluxos críticos passam no CI e na revisão manual em desktop/celular; falhas externas apresentam respostas controladas e rastreáveis.
 

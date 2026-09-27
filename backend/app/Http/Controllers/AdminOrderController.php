@@ -48,7 +48,7 @@ class AdminOrderController extends Controller
 
     public function customers(): AnonymousResourceCollection
     {
-        return AdminCustomerResource::collection(User::query()->where('role', UserRole::Customer)->orderBy('name')->get());
+        return AdminCustomerResource::collection(User::query()->where('role', UserRole::Customer)->orderBy('name')->limit(100)->get());
     }
 
     public function show(Order $order): AdminOrderResource

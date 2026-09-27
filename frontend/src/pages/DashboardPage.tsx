@@ -4,6 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuth } from '@/auth/useAuth'
 import { Button } from '@/components/ui/button'
+import { LoadingState } from '@/components/LoadingState'
 import { parseDashboard, parseOrders } from '@/lib/orders'
 
 const money = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -48,7 +49,8 @@ export function DashboardPage() {
     setParams(next)
   }
 
-  if (dashboard.isLoading || orders.isLoading) return <p>Carregando seus pedidos…</p>
+  if (dashboard.isLoading || orders.isLoading)
+    return <LoadingState label="Carregando seus pedidos…" />
   if (dashboard.isError || orders.isError) {
     return <p role="alert">Não foi possível carregar seus pedidos. Tente novamente mais tarde.</p>
   }

@@ -22,7 +22,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/conversations', [ConversationController::class, 'index']);
     Route::post('/conversations', [ConversationController::class, 'store']);
     Route::get('/conversations/{conversation}', [ConversationController::class, 'show']);
-    Route::post('/conversations/{conversation}/messages', [ConversationController::class, 'storeMessage']);
+    Route::post('/conversations/{conversation}/messages', [ConversationController::class, 'storeMessage'])->middleware('throttle:assistant');
 
     Route::prefix('admin')->middleware('can:access-admin')->group(function (): void {
         Route::get('/access', fn () => response()->noContent());

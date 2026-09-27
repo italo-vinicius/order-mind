@@ -148,3 +148,15 @@ test('renders a simulated assistant response and a link to its order', async ({ 
   await expect(page.getByText('O pedido')).toBeVisible()
   await expect(page.getByRole('link', { name: 'OM-2026-0002' })).toBeVisible()
 })
+
+test('keeps the customer dashboard within a mobile viewport', async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } })
+  const page = await context.newPage()
+  await page.goto('/login')
+  await page.getByRole('button', { name: 'Entrar como cliente demo' }).click()
+  await expect(page.getByRole('heading', { name: 'Seus pedidos' })).toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+    true,
+  )
+  await context.close()
+})

@@ -95,6 +95,19 @@ test('provider unavailability and tool-call limits have controlled responses', f
     expect(ToolLog::query()->where('conversation_id', $conversation->id)->count())->toBe(1);
 });
 
+test('assistant messages are rate limited per authenticated customer', function (): void {
+    $customer = User::factory()->create();
+    $conversation = Conversation::factory()->for($customer)->create();
+    $this->app->instance(AssistantProvider::class, new UnavailableAssistantProvider);
+
+    $this->actingAs($customer, 'sanctum');
+    foreach (range(1, 10) as $attempt) {
+        $this->postJson('/api/conversations/'.$conversation->id.'/messages', ['content' => "Tentativa {$attempt}"])->assertStatus(503);
+    }
+
+    $this->postJson('/api/conversations/'.$conversation->id.'/messages', ['content' => 'Uma a mais'])->assertTooManyRequests();
+});
+
 test('gemini client uses the generate content contract without managed tools', function (): void {
     config()->set('services.gemini.api_key', 'test-key');
     config()->set('services.gemini.model', 'gemini-3.7-flash');

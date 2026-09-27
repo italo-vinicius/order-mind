@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuth } from '@/auth/useAuth'
 import { Button } from '@/components/ui/button'
+import { LoadingState } from '@/components/LoadingState'
 import { ApiError } from '@/lib/api'
 import { parseOrderDetail } from '@/lib/orders'
 
@@ -33,7 +34,7 @@ export function OrderDetailPage() {
     },
   })
 
-  if (order.isLoading) return <p>Carregando pedido…</p>
+  if (order.isLoading) return <LoadingState label="Carregando pedido…" />
   if (order.isError || !order.data) {
     return <p role="alert">Não foi possível carregar este pedido.</p>
   }

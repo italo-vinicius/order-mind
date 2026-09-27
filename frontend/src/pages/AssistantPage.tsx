@@ -4,6 +4,7 @@ import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/auth/useAuth'
 import { Button } from '@/components/ui/button'
+import { LoadingState } from '@/components/LoadingState'
 import { ApiError } from '@/lib/api'
 import {
   parseAssistantMessage,
@@ -163,9 +164,7 @@ export function AssistantPage() {
         ) : (
           <>
             <div className="mt-7 min-h-72 space-y-4" aria-live="polite">
-              {conversation.isLoading ? (
-                <p className="text-sm text-[#52675f]">Carregando mensagens…</p>
-              ) : null}
+              {conversation.isLoading ? <LoadingState label="Carregando mensagens…" /> : null}
               {conversation.isError ? (
                 <p role="alert">Não foi possível carregar esta conversa.</p>
               ) : null}

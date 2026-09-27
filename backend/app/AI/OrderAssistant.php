@@ -10,8 +10,10 @@ use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\ToolLog;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
+use Throwable;
 
 class OrderAssistant
 {
@@ -56,17 +58,29 @@ class OrderAssistant
     {
         $safeName = mb_substr($name, 0, 64);
         $safeArguments = is_array($arguments) ? $arguments : [];
+        $startedAt = hrtime(true);
         try {
             $result = $this->tools->execute($user, $safeName, $safeArguments);
             ToolLog::query()->create(['user_id' => $user->id, 'conversation_id' => $conversation->id, 'message_id' => $message->id, 'tool_name' => $safeName, 'input' => $safeArguments, 'output' => $result, 'succeeded' => true]);
+            Log::info('Assistant tool completed.', ['tool_name' => $safeName, 'succeeded' => true, 'duration_ms' => $this->duration($startedAt)]);
 
             return $result;
         } catch (InvalidArgumentException|ValidationException $exception) {
             $result = ['error' => 'Não foi possível executar esta consulta.'];
             ToolLog::query()->create(['user_id' => $user->id, 'conversation_id' => $conversation->id, 'message_id' => $message->id, 'tool_name' => $safeName ?: 'unknown', 'input' => $safeArguments, 'output' => $result, 'succeeded' => false]);
+            Log::warning('Assistant tool rejected.', ['tool_name' => $safeName ?: 'unknown', 'succeeded' => false, 'duration_ms' => $this->duration($startedAt)]);
 
             return $result;
+        } catch (Throwable $exception) {
+            Log::error('Assistant tool failed.', ['tool_name' => $safeName ?: 'unknown', 'succeeded' => false, 'duration_ms' => $this->duration($startedAt)]);
+
+            throw $exception;
         }
+    }
+
+    private function duration(int $startedAt): int
+    {
+        return (int) round((hrtime(true) - $startedAt) / 1_000_000);
     }
 
     private function scheduleTitle(Conversation $conversation, string $firstMessage): void

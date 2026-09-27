@@ -19,7 +19,10 @@ use App\Models\User;
 use App\Policies\ConversationPolicy;
 use App\Policies\OrderPolicy;
 use App\Policies\ToolLogPolicy;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -48,5 +51,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Conversation::class, ConversationPolicy::class);
         Gate::policy(ToolLog::class, ToolLogPolicy::class);
         Gate::define('access-admin', fn (User $user): bool => $user->role === UserRole::Admin);
+        RateLimiter::for('assistant', fn (Request $request): Limit => Limit::perMinute(10)->by('assistant:'.($request->user()?->id ?? $request->ip())));
     }
 }
