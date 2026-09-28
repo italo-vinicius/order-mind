@@ -35,6 +35,16 @@ Principais diretórios:
 - `backend/tests/` e `frontend/e2e/`: testes de backend e ponta a ponta.
 - `scripts/`: preparo do ambiente e execução isolada dos testes backend.
 
+## Telas
+
+| Login | Dashboard do cliente |
+| --- | --- |
+| ![Tela de login do OrderMind](imgs/Login.png) | ![Dashboard de pedidos do cliente](imgs/Dashboard%20Cliente.png) |
+
+### Assistente de pedidos
+
+![Conversa com o assistente de IA](imgs/Assistente.png)
+
 ## Como executar
 
 ### Requisitos
