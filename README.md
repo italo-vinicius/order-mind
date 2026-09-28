@@ -37,9 +37,13 @@ Principais diretórios:
 
 ## Telas
 
-| Login | Dashboard do cliente |
-| --- | --- |
-| ![Tela de login do OrderMind](imgs/Login.png) | ![Dashboard de pedidos do cliente](imgs/Dashboard%20Cliente.png) |
+### Login
+
+![Tela de login do OrderMind](imgs/Login.png)
+
+### Dashboard do cliente
+
+![Dashboard de pedidos do cliente](imgs/Dashboard%20Cliente.png)
 
 ### Assistente de pedidos
 
