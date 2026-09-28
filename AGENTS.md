@@ -2,14 +2,14 @@
 
 ## Project Structure & Module Organization
 
-The local application foundation is implemented. Consult `docs/PLANO_IMPLEMENTACAO.md` for MVP scope, phase status, and completion criteria, and `docs/architecture.md` for technical decisions. `README.md` documents setup and daily commands.
+The local application is implemented. Consult `README.md` for project scope, architecture, setup, development commands, and configuration.
 
 Follow this monorepo layout:
 - `frontend/src/`: React and TypeScript application; `frontend/public/`: static assets.
 - `backend/app/`: Laravel controllers, requests, resources, policies, actions, and AI tools.
 - `backend/database/`: migrations, factories, and fictional demonstration seeders.
 - `backend/routes/` and `backend/tests/`: API routes and automated tests.
-- `docs/architecture.md` and `docs/screenshots/`: architecture notes and UI captures.
+- `README.md`: project overview, architecture, setup, and operational guidance.
 
 Keep controllers small, validation in Form Requests, authorization in Policies, and business rules in Actions or Services.
 
@@ -33,7 +33,7 @@ Pest runs backend tests in `backend/tests/Feature/`; use `bash scripts/test-back
 
 ## Commit & Pull Request Guidelines
 
-Create one closing commit per phase, including the updated implementation plan. Use its proposed commit subject, for example `docs: define environment and architecture decisions`. PRs should describe behavior, reference the relevant phase or issue, report validation, and include screenshots for UI changes.
+Use clear Conventional Commit-style subjects, for example `feat: add order filters`. PRs should describe behavior, reference the relevant issue when applicable, report validation, and include screenshots for UI changes.
 
 ## Security & Configuration
 
